@@ -72,6 +72,9 @@
     padding: 24px 32px 20px;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .cal-nav-row {
@@ -81,6 +84,8 @@
     margin-bottom: 18px;
     flex-wrap: wrap;
     gap: 12px;
+    width: 100%;
+    max-width: 840px;
   }
   .cal-nav { display: flex; align-items: center; gap: 12px; }
   .cal-nav-btn {
@@ -487,6 +492,22 @@
         <div class="stat-card"><div class="stat-val" id="stat-total-shifts">0</div><div class="stat-lbl">всего смен</div></div>
         <div class="stat-card"><div class="stat-val" id="stat-hours">0</div><div class="stat-lbl">рабочих часов</div></div>
       </div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="section-title" style="margin-bottom:10px">Расчёт оплаты</div>
+        <div class="field-row" style="margin-bottom:8px">
+          <span class="field-label">Ставка день, ₽/ч</span>
+          <input class="field-input" type="number" id="rate-day" value="0" min="0" step="10" oninput="updateStats();scheduleSave()">
+        </div>
+        <div class="field-row" style="margin-bottom:12px">
+          <span class="field-label">Ставка ночь, ₽/ч</span>
+          <input class="field-input" type="number" id="rate-night" value="0" min="0" step="10" oninput="updateStats();scheduleSave()">
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-salary" style="font-size:1.35rem">0 ₽</div>
+          <div class="stat-lbl">итого к получению</div>
+        </div>
+      </div>
     </div>
 
     <!-- COL 4: TIPS -->
@@ -587,6 +608,8 @@ function saveState() {
       hybridDayHours:   document.getElementById('hybrid-day-hours').value,
       hybridNightHours: document.getElementById('hybrid-night-hours').value,
       hybridStart:      document.getElementById('hybrid-start').value,
+      rateDay:          document.getElementById('rate-day').value,
+      rateNight:        document.getElementById('rate-night').value,
     }
   };
   try {
@@ -646,6 +669,8 @@ function loadState() {
     if (f.hybridDayHours)  document.getElementById('hybrid-day-hours').value  = f.hybridDayHours;
     if (f.hybridNightHours)document.getElementById('hybrid-night-hours').value= f.hybridNightHours;
     if (f.hybridStart)     document.getElementById('hybrid-start').value      = f.hybridStart;
+    if (f.rateDay)         document.getElementById('rate-day').value          = f.rateDay;
+    if (f.rateNight)       document.getElementById('rate-night').value        = f.rateNight;
 
     return true;
   } catch(e) { return false; }
@@ -978,17 +1003,23 @@ function updateStats() {
   const t=document.getElementById('stats-to').value;
   if(!f||!t)return;
   const from=parseDate(f),to=parseDate(t); if(from>to)return;
-  let dayS=0,nightS=0,hours=0; const cur=new Date(from);
+  let dayS=0,nightS=0,dayHours=0,nightHours=0; const cur=new Date(from);
   while(cur<=to){
     const ds=fmtDate(cur),shift=getShiftForDate(ds);
-    if(shift==='day')   {dayS++;  hours+=getHours('day',ds);}
-    if(shift==='night') {nightS++;hours+=getHours('night',ds);}
+    if(shift==='day')   {dayS++;   dayHours+=getHours('day',ds);}
+    if(shift==='night') {nightS++; nightHours+=getHours('night',ds);}
     cur.setDate(cur.getDate()+1);
   }
+  const rateDay   = parseFloat(document.getElementById('rate-day').value)   || 0;
+  const rateNight = parseFloat(document.getElementById('rate-night').value) || 0;
+  const salary    = dayHours * rateDay + nightHours * rateNight;
+  const salaryFmt = salary.toLocaleString('ru-RU', {maximumFractionDigits:0});
+
   document.getElementById('stat-day-shifts').textContent  = dayS;
   document.getElementById('stat-night-shifts').textContent= nightS;
   document.getElementById('stat-total-shifts').textContent= dayS+nightS;
-  document.getElementById('stat-hours').textContent       = hours;
+  document.getElementById('stat-hours').textContent       = dayHours+nightHours;
+  document.getElementById('stat-salary').textContent      = salaryFmt+' ₽';
 }
 
 // ══════════════════════════════════════════════════════
