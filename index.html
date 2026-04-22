@@ -35,7 +35,7 @@
     flex-direction: column;
   }
 
-  /* ── HEADER ─────────────────────────────── */
+  /* ── HEADER ─────────────────────────── */
   header {
     display: flex;
     align-items: center;
@@ -50,23 +50,26 @@
   .logo { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 1.05rem; letter-spacing: -0.02em; }
   .logo span { color: var(--muted); font-weight: 300; }
   .header-right { display: flex; gap: 8px; align-items: center; }
-
   .ghost-btn {
-    padding: 6px 14px;
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    cursor: pointer;
-    border-radius: 20px;
-    transition: var(--transition);
+    padding: 6px 14px; background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    cursor: pointer; border-radius: 20px; transition: var(--transition);
   }
   .ghost-btn:hover { border-color: var(--muted); color: var(--text); }
 
-  /* ── CALENDAR SECTION ───────────────────── */
+  /* save indicator */
+  .save-badge {
+    font-size: 0.65rem;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity 0.4s;
+    white-space: nowrap;
+  }
+  .save-badge.show { opacity: 1; }
+
+  /* ── CALENDAR SECTION ───────────────── */
   .calendar-section {
-    padding: 28px 40px 24px;
+    padding: 24px 32px 20px;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
   }
@@ -75,9 +78,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  .cal-nav { display: flex; align-items: center; gap: 14px; }
+  .cal-nav { display: flex; align-items: center; gap: 12px; }
   .cal-nav-btn {
     width: 32px; height: 32px;
     background: var(--surface); border: 1px solid var(--border); color: var(--text);
@@ -87,29 +92,31 @@
   }
   .cal-nav-btn:hover { background: var(--surface2); border-color: var(--muted); }
   .cal-month-title {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 300;
-    letter-spacing: -0.02em;
-    min-width: 200px;
-    text-align: center;
+    font-family: 'Unbounded', sans-serif; font-size: 1.1rem; font-weight: 300;
+    letter-spacing: -0.02em; min-width: 190px; text-align: center;
   }
-
-  /* Legend inline */
   .cal-legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: var(--muted); }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.67rem; color: var(--muted); }
   .legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 
-  /* Calendar grid */
+  /* ── CALENDAR GRID ──────────────────── */
+  /* Fixed-width container so the grid never stretches absurdly wide */
+  .cal-wrap {
+    max-width: 840px;
+    width: 100%;
+  }
   .cal-weekdays {
-    display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; margin-bottom: 5px;
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px; margin-bottom: 4px;
   }
   .cal-weekday {
-    text-align: center; font-size: 0.62rem; letter-spacing: 0.1em;
+    text-align: center; font-size: 0.61rem; letter-spacing: 0.1em;
     color: var(--muted); padding: 3px 0; text-transform: uppercase;
   }
-  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
-
+  .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
   .cal-cell {
     aspect-ratio: 1;
     border-radius: var(--radius-sm);
@@ -118,91 +125,67 @@
     transition: transform var(--transition);
     user-select: none;
     border: 1px solid transparent;
-    min-height: 56px;
-    max-height: 90px;
   }
-  .cal-cell:hover { transform: scale(1.05); z-index: 2; }
-  .cal-cell.other-month { opacity: 0.2; cursor: default; pointer-events: none; }
+  .cal-cell:hover { transform: scale(1.06); z-index: 2; }
+  .cal-cell.other-month { opacity: 0.18; cursor: default; pointer-events: none; }
   .cal-cell.today-cell { border-color: var(--muted) !important; }
 
   .cal-cell.off         { background: var(--off-color); }
   .cal-cell.day-shift   { background: var(--day-color); }
   .cal-cell.night-shift { background: var(--night-color); }
 
-  .cal-cell.day-shift   .cell-num { color: var(--day-text); }
-  .cal-cell.night-shift .cell-num { color: var(--night-text); }
-  .cal-cell.day-shift   .cell-type { color: var(--day-text); opacity: 0.6; }
-  .cal-cell.night-shift .cell-type { color: var(--night-text); opacity: 0.6; }
+  .cal-cell.day-shift   .cell-num  { color: var(--day-text); }
+  .cal-cell.night-shift .cell-num  { color: var(--night-text); }
+  .cal-cell.day-shift   .cell-type { color: var(--day-text);   opacity: 0.65; }
+  .cal-cell.night-shift .cell-type { color: var(--night-text); opacity: 0.65; }
 
   .hybrid-badge {
     position: absolute; top: 4px; right: 4px;
     width: 5px; height: 5px; border-radius: 50%;
-    background: #fb923c; box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
+    background: #fb923c; box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
   }
-  .cell-num { font-family: 'Unbounded', sans-serif; font-size: 0.9rem; font-weight: 400; color: var(--text); line-height: 1; }
-  .cell-type { font-size: 0.5rem; letter-spacing: 0.06em; color: var(--muted); margin-top: 3px; text-transform: uppercase; }
+  .cell-num  { font-family: 'Unbounded', sans-serif; font-size: 0.85rem; font-weight: 400; color: var(--text); line-height: 1; }
+  .cell-type { font-size: 0.48rem; letter-spacing: 0.06em; color: var(--muted); margin-top: 3px; text-transform: uppercase; }
 
-  /* ── SETTINGS PANEL ─────────────────────── */
-  .settings-panel {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-  }
+  /* ── SETTINGS PANEL ─────────────────── */
+  .settings-panel { background: var(--surface); border-top: 1px solid var(--border); }
 
-  /* Accordion toggle */
   .panel-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 32px;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    cursor: pointer;
-    transition: var(--transition);
-    letter-spacing: 0.05em;
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 12px 32px; background: transparent; border: none;
+    border-bottom: 1px solid transparent; color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    cursor: pointer; transition: var(--transition); letter-spacing: 0.05em;
   }
   .panel-toggle:hover { color: var(--text); background: var(--surface2); }
-  .panel-toggle .arrow { transition: transform var(--transition); font-size: 0.65rem; }
-  .panel-toggle.open .arrow { transform: rotate(180deg); }
+  .panel-toggle.open { border-bottom-color: var(--border); }
+  .toggle-arrow { transition: transform var(--transition); font-size: 0.6rem; }
+  .panel-toggle.open .toggle-arrow { transform: rotate(180deg); }
 
   .panel-body {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 0;
+    grid-template-columns: repeat(4, 1fr);
     overflow: hidden;
     max-height: 0;
-    transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+    transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1);
   }
-  .panel-body.open { max-height: 800px; }
+  .panel-body.open { max-height: 900px; }
 
   .panel-col {
-    padding: 24px 24px;
+    padding: 22px 22px;
     border-right: 1px solid var(--border);
   }
   .panel-col:last-child { border-right: none; }
 
   .section-title {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 0.56rem;
-    font-weight: 400;
-    letter-spacing: 0.13em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 14px;
+    font-family: 'Unbounded', sans-serif; font-size: 0.56rem; font-weight: 400;
+    letter-spacing: 0.13em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
   }
 
-  /* ── SCHEDULE ───────────────────────────── */
+  /* ── SCHEDULE ───────────────────────── */
   .schedule-type-tabs {
-    display: flex;
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 3px; gap: 3px;
-    margin-bottom: 14px;
+    display: flex; background: var(--surface2); border-radius: var(--radius-sm);
+    padding: 3px; gap: 3px; margin-bottom: 14px;
   }
   .tab-btn {
     flex: 1; padding: 6px 4px; border: none; background: transparent;
@@ -255,7 +238,7 @@
   }
   .clear-btn:hover { border-color: var(--muted); color: var(--text); }
 
-  /* ── HYBRID PATTERN ─────────────────────── */
+  /* ── HYBRID PATTERN ─────────────────── */
   .pattern-wrap { display: flex; flex-direction: column; gap: 7px; }
   .pattern-label { font-size: 0.68rem; color: var(--muted); }
   .pattern-editor { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
@@ -271,13 +254,13 @@
   .pattern-add-btn {
     width: 28px; height: 28px; border-radius: 5px; border: 1px dashed var(--border);
     background: transparent; color: var(--muted); font-size: 1.1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: var(--transition);
-    flex-shrink: 0; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition); flex-shrink: 0; line-height: 1;
   }
   .pattern-add-btn:hover { border-color: var(--muted); color: var(--text); }
   .pattern-hint { font-size: 0.6rem; color: var(--muted); }
 
-  /* ── COLORS ─────────────────────────────── */
+  /* ── COLORS ─────────────────────────── */
   .color-grid { display: flex; flex-direction: column; gap: 10px; }
   .color-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .color-label { font-size: 0.72rem; color: var(--muted); }
@@ -289,9 +272,9 @@
   .color-preview:hover { transform: scale(1.1); }
   input[type=color] { display: none; }
 
-  /* ── STATS ──────────────────────────────── */
+  /* ── STATS ──────────────────────────── */
   .stats-range { display: flex; gap: 6px; margin-bottom: 12px; align-items: center; }
-  .stats-range .date-input { flex: 1; font-size: 0.68rem; }
+  .stats-range .date-input { flex: 1; }
   .stats-sep { color: var(--muted); font-size: 0.7rem; }
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
   .stat-card {
@@ -304,13 +287,19 @@
   }
   .stat-lbl { font-size: 0.62rem; color: var(--muted); }
 
-  /* ── CONTEXT MENU ───────────────────────── */
+  /* ── TIPS COL ───────────────────────── */
+  .tips { display: flex; flex-direction: column; gap: 10px; }
+  .tip-group-title { color: var(--text); font-size: 0.72rem; margin-bottom: 5px; }
+  .tip-line { font-size: 0.7rem; color: var(--muted); line-height: 1.7; }
+  .tip-sep { height: 1px; background: var(--border); }
+
+  /* ── CONTEXT MENU ───────────────────── */
   .ctx-menu {
     position: fixed; background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 6px; z-index: 1000; min-width: 170px;
     box-shadow: 0 16px 40px rgba(0,0,0,0.5); animation: fadeIn 0.12s ease; display: none;
   }
-  @keyframes fadeIn { from { opacity:0; transform:scale(0.95) translateY(-4px); } to { opacity:1; transform:none; } }
+  @keyframes fadeIn { from{opacity:0;transform:scale(0.95) translateY(-4px);}to{opacity:1;transform:none;} }
   .ctx-menu.visible { display: block; }
   .ctx-item {
     padding: 8px 12px; font-size: 0.74rem; color: var(--text); cursor: pointer;
@@ -321,7 +310,7 @@
   .ctx-icon { font-size: 0.82rem; width: 16px; text-align: center; }
   .ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
 
-  /* ── TOOLTIP ────────────────────────────── */
+  /* ── TOOLTIP ────────────────────────── */
   .tooltip {
     position: fixed; background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-sm); padding: 6px 10px; font-size: 0.67rem; color: var(--muted);
@@ -338,13 +327,13 @@
     .panel-col { border-bottom: 1px solid var(--border); }
     .panel-col:nth-child(2n) { border-right: none; }
   }
-  @media (max-width: 700px) {
-    .calendar-section { padding: 20px 16px 18px; }
+  @media (max-width: 680px) {
+    .calendar-section { padding: 16px 14px 14px; }
     .panel-body { grid-template-columns: 1fr; }
     .panel-col { border-right: none; }
-    .cal-cell { min-height: 42px; }
-    .cell-type { display: none; }
     header { padding: 14px 16px; }
+    .cell-type { display: none; }
+    .cal-legend { display: none; }
   }
 </style>
 </head>
@@ -353,11 +342,12 @@
 <header>
   <div class="logo">shift<span>/cal</span></div>
   <div class="header-right">
+    <span class="save-badge" id="save-badge">✓ сохранено</span>
     <button class="ghost-btn" onclick="goToday()">Сегодня</button>
   </div>
 </header>
 
-<!-- ═══ CALENDAR (TOP) ═══════════════════════════════════ -->
+<!-- ═══ CALENDAR ════════════════════════════════ -->
 <div class="calendar-section">
   <div class="cal-nav-row">
     <div class="cal-nav">
@@ -373,19 +363,22 @@
       <div class="legend-item"><div style="width:7px;height:7px;border-radius:50%;background:#fb923c;flex-shrink:0"></div><span>Гибрид</span></div>
     </div>
   </div>
-  <div class="cal-weekdays">
-    <div class="cal-weekday">Пн</div><div class="cal-weekday">Вт</div>
-    <div class="cal-weekday">Ср</div><div class="cal-weekday">Чт</div>
-    <div class="cal-weekday">Пт</div><div class="cal-weekday">Сб</div>
-    <div class="cal-weekday">Вс</div>
+  <!-- Grid is constrained to a sane max-width so columns don't spread on wide screens -->
+  <div class="cal-wrap">
+    <div class="cal-weekdays">
+      <div class="cal-weekday">Пн</div><div class="cal-weekday">Вт</div>
+      <div class="cal-weekday">Ср</div><div class="cal-weekday">Чт</div>
+      <div class="cal-weekday">Пт</div><div class="cal-weekday">Сб</div>
+      <div class="cal-weekday">Вс</div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
   </div>
-  <div class="cal-grid" id="cal-grid"></div>
 </div>
 
-<!-- ═══ SETTINGS PANEL (BOTTOM) ═════════════════════════ -->
+<!-- ═══ SETTINGS PANEL ══════════════════════════ -->
 <div class="settings-panel">
   <button class="panel-toggle" id="panel-toggle" onclick="togglePanel()">
-    <span class="arrow" id="panel-arrow">▼</span>
+    <span class="toggle-arrow" id="panel-arrow">▼</span>
     <span id="panel-label">Настройки и статистика</span>
   </button>
 
@@ -402,22 +395,10 @@
 
       <!-- DAY -->
       <div class="shift-config" id="day-config">
-        <div class="field-row">
-          <span class="field-label">Рабочих дней</span>
-          <input class="field-input" type="number" id="day-work" value="2" min="1" max="30">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Выходных дней</span>
-          <input class="field-input" type="number" id="day-rest" value="2" min="1" max="30">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Часов в смене</span>
-          <input class="field-input" type="number" id="day-hours" value="12" min="1" max="24">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Начало цикла</span>
-          <input class="date-input" type="date" id="day-start">
-        </div>
+        <div class="field-row"><span class="field-label">Рабочих дней</span><input class="field-input" type="number" id="day-work" value="2" min="1" max="30"></div>
+        <div class="field-row"><span class="field-label">Выходных дней</span><input class="field-input" type="number" id="day-rest" value="2" min="1" max="30"></div>
+        <div class="field-row"><span class="field-label">Часов в смене</span><input class="field-input" type="number" id="day-hours" value="12" min="1" max="24"></div>
+        <div class="field-row"><span class="field-label">Начало цикла</span><input class="date-input" type="date" id="day-start"></div>
         <div class="preset-row">
           <button class="preset-btn" onclick="setPreset('day',2,2,this)">2/2</button>
           <button class="preset-btn" onclick="setPreset('day',5,2,this)">5/2</button>
@@ -431,22 +412,10 @@
 
       <!-- NIGHT -->
       <div class="shift-config" id="night-config" style="display:none">
-        <div class="field-row">
-          <span class="field-label">Рабочих дней</span>
-          <input class="field-input" type="number" id="night-work" value="2" min="1" max="30">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Выходных дней</span>
-          <input class="field-input" type="number" id="night-rest" value="2" min="1" max="30">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Часов в смене</span>
-          <input class="field-input" type="number" id="night-hours" value="12" min="1" max="24">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Начало цикла</span>
-          <input class="date-input" type="date" id="night-start">
-        </div>
+        <div class="field-row"><span class="field-label">Рабочих дней</span><input class="field-input" type="number" id="night-work" value="2" min="1" max="30"></div>
+        <div class="field-row"><span class="field-label">Выходных дней</span><input class="field-input" type="number" id="night-rest" value="2" min="1" max="30"></div>
+        <div class="field-row"><span class="field-label">Часов в смене</span><input class="field-input" type="number" id="night-hours" value="12" min="1" max="24"></div>
+        <div class="field-row"><span class="field-label">Начало цикла</span><input class="date-input" type="date" id="night-start"></div>
         <div class="preset-row">
           <button class="preset-btn" onclick="setPreset('night',2,2,this)">2/2</button>
           <button class="preset-btn" onclick="setPreset('night',5,2,this)">5/2</button>
@@ -474,18 +443,9 @@
             <button class="preset-btn" onclick="setHybridPreset([{t:'day'},{t:'day'},{t:'night'},{t:'off'},{t:'off'}],this)">2Д·Н·2в</button>
           </div>
         </div>
-        <div class="field-row">
-          <span class="field-label">Часов (день)</span>
-          <input class="field-input" type="number" id="hybrid-day-hours" value="12" min="1" max="24">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Часов (ночь)</span>
-          <input class="field-input" type="number" id="hybrid-night-hours" value="12" min="1" max="24">
-        </div>
-        <div class="field-row">
-          <span class="field-label">Начало цикла</span>
-          <input class="date-input" type="date" id="hybrid-start">
-        </div>
+        <div class="field-row"><span class="field-label">Часов (день)</span><input class="field-input" type="number" id="hybrid-day-hours" value="12" min="1" max="24"></div>
+        <div class="field-row"><span class="field-label">Часов (ночь)</span><input class="field-input" type="number" id="hybrid-night-hours" value="12" min="1" max="24"></div>
+        <div class="field-row"><span class="field-label">Начало цикла</span><input class="date-input" type="date" id="hybrid-start"></div>
         <button class="apply-btn" onclick="applySchedule('hybrid')">Применить</button>
         <button class="clear-btn" onclick="clearSchedule('hybrid')">Сбросить</button>
       </div>
@@ -532,26 +492,32 @@
     <!-- COL 4: TIPS -->
     <div class="panel-col">
       <div class="section-title">Управление</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="font-size:0.72rem;color:var(--muted);line-height:1.6">
-          <div style="margin-bottom:8px;color:var(--text);font-size:0.74rem">Ячейки календаря</div>
-          <div>🖱 <b style="color:var(--text)">Клик</b> — сменить тип дня</div>
-          <div style="margin-top:4px">🖱 <b style="color:var(--text)">Правый клик</b> — меню выбора</div>
-          <div style="margin-top:4px">🖱 <b style="color:var(--text)">Наведение</b> — детали дня</div>
+      <div class="tips">
+        <div>
+          <div class="tip-group-title">Ячейки календаря</div>
+          <div class="tip-line">🖱 <b style="color:var(--text)">Клик</b> — сменить тип дня</div>
+          <div class="tip-line">🖱 <b style="color:var(--text)">Правый клик</b> — меню выбора</div>
+          <div class="tip-line">🖱 <b style="color:var(--text)">Наведение</b> — детали дня</div>
         </div>
-        <div style="height:1px;background:var(--border)"></div>
-        <div style="font-size:0.72rem;color:var(--muted);line-height:1.6">
-          <div style="margin-bottom:8px;color:var(--text);font-size:0.74rem">Приоритеты</div>
-          <div>1. Ручной выбор <span style="color:var(--text)">✎</span></div>
-          <div style="margin-top:4px">2. Гибридный график</div>
-          <div style="margin-top:4px">3. Дневной / ночной</div>
+        <div class="tip-sep"></div>
+        <div>
+          <div class="tip-group-title">Приоритеты</div>
+          <div class="tip-line">1. Ручной выбор <span style="color:var(--text)">✎</span></div>
+          <div class="tip-line">2. Гибридный график</div>
+          <div class="tip-line">3. Дневной / ночной</div>
         </div>
-        <div style="height:1px;background:var(--border)"></div>
-        <div style="font-size:0.72rem;color:var(--muted);line-height:1.6">
-          <div style="margin-bottom:8px;color:var(--text);font-size:0.74rem">Гибридный паттерн</div>
-          <div>ЛКМ по слоту — смена типа</div>
-          <div style="margin-top:4px">ПКМ по слоту — удалить</div>
-          <div style="margin-top:4px">+ — добавить слот</div>
+        <div class="tip-sep"></div>
+        <div>
+          <div class="tip-group-title">Гибридный паттерн</div>
+          <div class="tip-line">ЛКМ по слоту — сменить тип</div>
+          <div class="tip-line">ПКМ по слоту — удалить</div>
+          <div class="tip-line">+ — добавить слот</div>
+        </div>
+        <div class="tip-sep"></div>
+        <div>
+          <div class="tip-group-title">Сохранение</div>
+          <div class="tip-line">Данные автоматически сохраняются в браузере при каждом изменении.</div>
+          <button class="clear-btn" style="margin-top:8px" onclick="clearAllData()">🗑 Сбросить всё</button>
         </div>
       </div>
     </div>
@@ -569,51 +535,204 @@
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
 const today = new Date(); today.setHours(0,0,0,0);
 let viewYear  = today.getFullYear();
 let viewMonth = today.getMonth();
-let manualOverrides = {};
+let manualOverrides = {};  // { "YYYY-MM-DD": "day"|"night"|"off" }
 let schedules = { day: null, night: null, hybrid: null };
 let hybridPattern = [{t:'day'},{t:'night'},{t:'off'},{t:'off'}];
 let ctxTargetDate = null;
 let panelOpen = false;
+const STORAGE_KEY = 'shiftcal_v1';
 
-// ── INIT ──────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  PERSISTENCE — localStorage
+// ══════════════════════════════════════════════════════
+function saveState() {
+  const colors = {
+    day:   document.getElementById('day-color-in').value,
+    night: document.getElementById('night-color-in').value,
+    off:   document.getElementById('off-color-in').value,
+  };
+
+  // Serialise schedules: convert startDate (Date obj) → string
+  const serSched = {};
+  for (const [k, s] of Object.entries(schedules)) {
+    if (!s) { serSched[k] = null; continue; }
+    serSched[k] = { ...s, startDate: fmtDate(s.startDate) };
+  }
+
+  const state = {
+    viewYear, viewMonth,
+    manualOverrides,
+    schedules: serSched,
+    hybridPattern,
+    panelOpen,
+    colors,
+    statsFrom: document.getElementById('stats-from').value,
+    statsTo:   document.getElementById('stats-to').value,
+    // form fields (for display when restored)
+    fields: {
+      dayWork:   document.getElementById('day-work').value,
+      dayRest:   document.getElementById('day-rest').value,
+      dayHours:  document.getElementById('day-hours').value,
+      dayStart:  document.getElementById('day-start').value,
+      nightWork: document.getElementById('night-work').value,
+      nightRest: document.getElementById('night-rest').value,
+      nightHours:document.getElementById('night-hours').value,
+      nightStart:document.getElementById('night-start').value,
+      hybridDayHours:   document.getElementById('hybrid-day-hours').value,
+      hybridNightHours: document.getElementById('hybrid-night-hours').value,
+      hybridStart:      document.getElementById('hybrid-start').value,
+    }
+  };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    flashSaved();
+  } catch(e) { /* quota exceeded or private mode */ }
+}
+
+function loadState() {
+  let raw;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return false; }
+  if (!raw) return false;
+  try {
+    const s = JSON.parse(raw);
+
+    // View
+    viewYear  = s.viewYear  ?? today.getFullYear();
+    viewMonth = s.viewMonth ?? today.getMonth();
+
+    // Overrides
+    manualOverrides = s.manualOverrides ?? {};
+
+    // Hybrid pattern
+    hybridPattern = s.hybridPattern ?? [{t:'day'},{t:'night'},{t:'off'},{t:'off'}];
+
+    // Schedules (restore startDate strings → Date objects)
+    schedules = { day: null, night: null, hybrid: null };
+    for (const [k, sc] of Object.entries(s.schedules ?? {})) {
+      if (!sc) continue;
+      schedules[k] = { ...sc, startDate: parseDate(sc.startDate) };
+    }
+
+    // Panel
+    panelOpen = s.panelOpen ?? false;
+
+    // Colors
+    if (s.colors) {
+      applyColorVar('day-color',   s.colors.day,   'day-preview',   'legend-day',   'day-color-in');
+      applyColorVar('night-color', s.colors.night, 'night-preview', 'legend-night', 'night-color-in');
+      applyColorVar('off-color',   s.colors.off,   'off-preview',   'legend-off',   'off-color-in');
+    }
+
+    // Stats range
+    if (s.statsFrom) document.getElementById('stats-from').value = s.statsFrom;
+    if (s.statsTo)   document.getElementById('stats-to').value   = s.statsTo;
+
+    // Form fields
+    const f = s.fields ?? {};
+    if (f.dayWork)         document.getElementById('day-work').value          = f.dayWork;
+    if (f.dayRest)         document.getElementById('day-rest').value          = f.dayRest;
+    if (f.dayHours)        document.getElementById('day-hours').value         = f.dayHours;
+    if (f.dayStart)        document.getElementById('day-start').value         = f.dayStart;
+    if (f.nightWork)       document.getElementById('night-work').value        = f.nightWork;
+    if (f.nightRest)       document.getElementById('night-rest').value        = f.nightRest;
+    if (f.nightHours)      document.getElementById('night-hours').value       = f.nightHours;
+    if (f.nightStart)      document.getElementById('night-start').value       = f.nightStart;
+    if (f.hybridDayHours)  document.getElementById('hybrid-day-hours').value  = f.hybridDayHours;
+    if (f.hybridNightHours)document.getElementById('hybrid-night-hours').value= f.hybridNightHours;
+    if (f.hybridStart)     document.getElementById('hybrid-start').value      = f.hybridStart;
+
+    return true;
+  } catch(e) { return false; }
+}
+
+function applyColorVar(varName, value, previewId, legendId, inputId) {
+  if (!value) return;
+  document.documentElement.style.setProperty(`--${varName}`, value);
+  document.getElementById(previewId).style.background = value;
+  if (legendId) document.getElementById(legendId).style.background = value;
+  document.getElementById(inputId).value = value;
+  // text contrast
+  if (varName === 'day-color') {
+    document.documentElement.style.setProperty('--day-text', getLum(value)>0.4?'#0e0e0f':'#e8e8ea');
+  }
+  if (varName === 'night-color') {
+    document.documentElement.style.setProperty('--night-text', getLum(value)>0.4?'#0e0e0f':'#e8e8ea');
+  }
+}
+
+let saveTimer = null;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveState, 400);
+}
+
+function flashSaved() {
+  const badge = document.getElementById('save-badge');
+  badge.classList.add('show');
+  setTimeout(() => badge.classList.remove('show'), 1800);
+}
+
+function clearAllData() {
+  if (!confirm('Сбросить все данные и начать заново?')) return;
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+  location.reload();
+}
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
 function init() {
   const ts = fmtDate(today);
+  // Default dates before potential load
   ['day-start','night-start','hybrid-start'].forEach(id => document.getElementById(id).value = ts);
   const m1 = new Date(today.getFullYear(), today.getMonth(), 1);
   const m2 = new Date(today.getFullYear(), today.getMonth()+1, 0);
   document.getElementById('stats-from').value = fmtDate(m1);
   document.getElementById('stats-to').value   = fmtDate(m2);
-  document.getElementById('stats-from').addEventListener('change', updateStats);
-  document.getElementById('stats-to').addEventListener('change', updateStats);
+
+  // Load saved state (overwrites defaults if present)
+  loadState();
+
+  // Restore panel state
+  if (panelOpen) {
+    document.getElementById('panel-body').classList.add('open');
+    document.getElementById('panel-toggle').classList.add('open');
+    document.getElementById('panel-arrow').textContent = '▲';
+    document.getElementById('panel-label').textContent = 'Свернуть';
+  }
+
+  // Stats listeners
+  document.getElementById('stats-from').addEventListener('change', () => { updateStats(); scheduleSave(); });
+  document.getElementById('stats-to').addEventListener('change',   () => { updateStats(); scheduleSave(); });
+
   renderPatternEditor();
   renderCalendar();
   updateStats();
+
   document.addEventListener('click', hideCtx);
   document.addEventListener('keydown', e => { if(e.key==='Escape') hideCtx(); });
 }
 
-// ── PANEL TOGGLE ──────────────────────────────
-function togglePanel() {
-  panelOpen = !panelOpen;
-  document.getElementById('panel-body').classList.toggle('open', panelOpen);
-  document.getElementById('panel-toggle').classList.toggle('open', panelOpen);
-  document.getElementById('panel-arrow').textContent = panelOpen ? '▲' : '▼';
-  document.getElementById('panel-label').textContent = panelOpen ? 'Свернуть' : 'Настройки и статистика';
-}
-
-// ── UTILS ─────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════
 function fmtDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 function parseDate(s) { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
 function diffDays(a,b) { return Math.round((b-a)/86400000); }
-const MONTHS_RU=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                   'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 
-// ── SCHEDULE RESOLUTION ───────────────────────
+// ══════════════════════════════════════════════════════
+//  SCHEDULE RESOLUTION
+// ══════════════════════════════════════════════════════
 function getShiftForDate(ds) {
   if (manualOverrides[ds] !== undefined) return manualOverrides[ds];
   const d = parseDate(ds);
@@ -646,7 +765,9 @@ function getHours(type, ds) {
   return 12;
 }
 
-// ── CALENDAR ──────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  CALENDAR RENDER
+// ══════════════════════════════════════════════════════
 function renderCalendar() {
   document.getElementById('month-title').textContent = `${MONTHS_RU[viewMonth]} ${viewYear}`;
   const grid = document.getElementById('cal-grid');
@@ -654,10 +775,10 @@ function renderCalendar() {
   const firstDay = new Date(viewYear, viewMonth, 1);
   const lastDay  = new Date(viewYear, viewMonth+1, 0);
   let dow = firstDay.getDay(); dow = dow===0?6:dow-1;
-  for (let i=0; i<dow; i++) grid.appendChild(makeCell(new Date(viewYear,viewMonth,1-(dow-i)),true));
-  for (let d=1; d<=lastDay.getDate(); d++) grid.appendChild(makeCell(new Date(viewYear,viewMonth,d),false));
-  const rem = (dow+lastDay.getDate())%7;
-  if (rem) for (let i=1; i<=7-rem; i++) grid.appendChild(makeCell(new Date(viewYear,viewMonth+1,i),true));
+  for (let i=0;i<dow;i++) grid.appendChild(makeCell(new Date(viewYear,viewMonth,1-(dow-i)),true));
+  for (let d=1;d<=lastDay.getDate();d++) grid.appendChild(makeCell(new Date(viewYear,viewMonth,d),false));
+  const rem=(dow+lastDay.getDate())%7;
+  if(rem) for(let i=1;i<=7-rem;i++) grid.appendChild(makeCell(new Date(viewYear,viewMonth+1,i),true));
   updateStats();
 }
 
@@ -686,7 +807,7 @@ function makeCell(date, other) {
 }
 
 function typeLabel(shift, ds) {
-  const p = isHybridSource(ds)?'г/':'';
+  const p=isHybridSource(ds)?'г/':'';
   if(shift==='day') return p+'день';
   if(shift==='night') return p+'ночь';
   return '';
@@ -703,46 +824,77 @@ function refreshCell(cell, ds) {
   const t=cell.querySelector('.cell-type'); if(t) t.textContent=typeLabel(shift,ds);
   let b=cell.querySelector('.hybrid-badge');
   if(isHybridSource(ds)){if(!b){b=document.createElement('div');b.className='hybrid-badge';cell.appendChild(b);}}
-  else{if(b)b.remove();}
+  else if(b) b.remove();
 }
 function cycleShift(ds, cell) {
   const cur=getShiftForDate(ds); let next;
-  if(!cur||cur==='off') next='day'; else if(cur==='day') next='night'; else if(cur==='night') next='off'; else next=null;
-  if(next===null) delete manualOverrides[ds]; else manualOverrides[ds]=next;
-  refreshCell(cell,ds); updateStats();
+  if(!cur||cur==='off') next='day';
+  else if(cur==='day')  next='night';
+  else                  next='off';
+  manualOverrides[ds]=next;
+  refreshCell(cell,ds); updateStats(); scheduleSave();
 }
 
-// ── TABS / PRESETS ────────────────────────────
+// ══════════════════════════════════════════════════════
+//  PANEL TOGGLE
+// ══════════════════════════════════════════════════════
+function togglePanel() {
+  panelOpen = !panelOpen;
+  document.getElementById('panel-body').classList.toggle('open', panelOpen);
+  document.getElementById('panel-toggle').classList.toggle('open', panelOpen);
+  document.getElementById('panel-arrow').textContent = panelOpen ? '▲' : '▼';
+  document.getElementById('panel-label').textContent = panelOpen ? 'Свернуть' : 'Настройки и статистика';
+  scheduleSave();
+}
+
+// ══════════════════════════════════════════════════════
+//  TABS / PRESETS
+// ══════════════════════════════════════════════════════
 function setTab(type, btn) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
   ['day-config','night-config','hybrid-config'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById(`${type}-config`).style.display='flex';
 }
 function setPreset(type,work,rest,btn) {
-  document.getElementById(`${type}-work`).value=work; document.getElementById(`${type}-rest`).value=rest;
-  document.querySelectorAll(`#${type}-config .preset-btn`).forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  document.getElementById(`${type}-work`).value=work;
+  document.getElementById(`${type}-rest`).value=rest;
+  document.querySelectorAll(`#${type}-config .preset-btn`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
 }
 function setHybridPreset(pattern, btn) {
   hybridPattern=pattern.map(p=>({...p})); renderPatternEditor();
-  document.querySelectorAll('#hybrid-presets .preset-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  document.querySelectorAll('#hybrid-presets .preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
-// ── PATTERN EDITOR ────────────────────────────
-const SCYCLE=['day','night','off'], SICON={day:'☀',night:'☾',off:'○'}, SCLS={day:'slot-day',night:'slot-night',off:'slot-off'};
+// ══════════════════════════════════════════════════════
+//  PATTERN EDITOR
+// ══════════════════════════════════════════════════════
+const SCYCLE=['day','night','off'],SICON={day:'☀',night:'☾',off:'○'},SCLS={day:'slot-day',night:'slot-night',off:'slot-off'};
 function renderPatternEditor() {
   const ed=document.getElementById('pattern-editor'); ed.innerHTML='';
   hybridPattern.forEach((slot,i)=>{
     const el=document.createElement('div');
     el.className=`pattern-slot ${SCLS[slot.t]}`; el.textContent=SICON[slot.t]; el.title='ЛКМ — тип · ПКМ — удалить';
-    el.addEventListener('click',()=>{ slot.t=SCYCLE[(SCYCLE.indexOf(slot.t)+1)%3]; el.className=`pattern-slot ${SCLS[slot.t]}`; el.textContent=SICON[slot.t]; });
-    el.addEventListener('contextmenu',e=>{ e.preventDefault(); if(hybridPattern.length>1){hybridPattern.splice(i,1);renderPatternEditor();} });
+    el.addEventListener('click',()=>{
+      slot.t=SCYCLE[(SCYCLE.indexOf(slot.t)+1)%3];
+      el.className=`pattern-slot ${SCLS[slot.t]}`; el.textContent=SICON[slot.t];
+      scheduleSave();
+    });
+    el.addEventListener('contextmenu',e=>{
+      e.preventDefault();
+      if(hybridPattern.length>1){hybridPattern.splice(i,1);renderPatternEditor();scheduleSave();}
+    });
     ed.appendChild(el);
   });
-  const add=document.createElement('button'); add.className='pattern-add-btn'; add.textContent='+'; add.title='Добавить слот';
-  add.onclick=()=>{ hybridPattern.push({t:'off'}); renderPatternEditor(); }; ed.appendChild(add);
+  const add=document.createElement('button'); add.className='pattern-add-btn'; add.textContent='+';
+  add.onclick=()=>{hybridPattern.push({t:'off'});renderPatternEditor();scheduleSave();};
+  ed.appendChild(add);
 }
 
-// ── APPLY / CLEAR ─────────────────────────────
+// ══════════════════════════════════════════════════════
+//  APPLY / CLEAR
+// ══════════════════════════════════════════════════════
 function applySchedule(type) {
   if(type==='hybrid') {
     schedules.hybrid={
@@ -759,42 +911,57 @@ function applySchedule(type) {
       startDate:parseDate(document.getElementById(`${type}-start`).value||fmtDate(today))
     };
   }
-  renderCalendar();
+  renderCalendar(); scheduleSave();
 }
-function clearSchedule(type) { schedules[type]=null; renderCalendar(); }
 
-// ── NAV ───────────────────────────────────────
+function clearSchedule(type) { schedules[type]=null; renderCalendar(); scheduleSave(); }
+
+// ══════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════
 function changeMonth(dir) {
-  viewMonth+=dir; if(viewMonth>11){viewMonth=0;viewYear++;} if(viewMonth<0){viewMonth=11;viewYear--;}
-  renderCalendar();
+  viewMonth+=dir;
+  if(viewMonth>11){viewMonth=0;viewYear++;} if(viewMonth<0){viewMonth=11;viewYear--;}
+  renderCalendar(); scheduleSave();
 }
-function goToday() { viewYear=today.getFullYear(); viewMonth=today.getMonth(); renderCalendar(); }
+function goToday() {
+  viewYear=today.getFullYear(); viewMonth=today.getMonth(); renderCalendar(); scheduleSave();
+}
 
-// ── CONTEXT MENU ──────────────────────────────
+// ══════════════════════════════════════════════════════
+//  CONTEXT MENU
+// ══════════════════════════════════════════════════════
 function showCtx(e,ds) {
-  ctxTargetDate=ds; const menu=document.getElementById('ctx-menu'); menu.classList.add('visible');
+  ctxTargetDate=ds;
+  const menu=document.getElementById('ctx-menu'); menu.classList.add('visible');
   let x=e.clientX,y=e.clientY;
   if(x+190>window.innerWidth)x-=190; if(y+170>window.innerHeight)y-=170;
   menu.style.left=x+'px'; menu.style.top=y+'px';
 }
 function hideCtx(){document.getElementById('ctx-menu').classList.remove('visible');}
 function ctxSet(type){
-  if(!ctxTargetDate)return; manualOverrides[ctxTargetDate]=type;
-  const cell=document.querySelector(`.cal-cell[data-date="${ctxTargetDate}"]`); if(cell)refreshCell(cell,ctxTargetDate);
-  updateStats(); hideCtx();
+  if(!ctxTargetDate)return;
+  manualOverrides[ctxTargetDate]=type;
+  const cell=document.querySelector(`.cal-cell[data-date="${ctxTargetDate}"]`);
+  if(cell)refreshCell(cell,ctxTargetDate);
+  updateStats(); scheduleSave(); hideCtx();
 }
 function ctxClear(){
-  if(!ctxTargetDate)return; delete manualOverrides[ctxTargetDate];
-  const cell=document.querySelector(`.cal-cell[data-date="${ctxTargetDate}"]`); if(cell)refreshCell(cell,ctxTargetDate);
-  updateStats(); hideCtx();
+  if(!ctxTargetDate)return;
+  delete manualOverrides[ctxTargetDate];
+  const cell=document.querySelector(`.cal-cell[data-date="${ctxTargetDate}"]`);
+  if(cell)refreshCell(cell,ctxTargetDate);
+  updateStats(); scheduleSave(); hideCtx();
 }
 
-// ── TOOLTIP ───────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  TOOLTIP
+// ══════════════════════════════════════════════════════
 function showTooltip(e,ds,date) {
   const shift=getShiftForDate(ds);
   const dow=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][date.getDay()];
   let txt=`${dow}, ${date.getDate()}.${String(date.getMonth()+1).padStart(2,'0')}.${date.getFullYear()}`;
-  if(shift==='day')   txt+=` · ☀ Дневная ${getHours('day',ds)}ч${isHybridSource(ds)?' [гибрид]':''}`;
+  if(shift==='day')        txt+=` · ☀ Дневная ${getHours('day',ds)}ч${isHybridSource(ds)?' [гибрид]':''}`;
   else if(shift==='night') txt+=` · ☾ Ночная ${getHours('night',ds)}ч${isHybridSource(ds)?' [гибрид]':''}`;
   else txt+=' · Выходной';
   if(manualOverrides[ds]!==undefined) txt+=' ✎';
@@ -803,32 +970,34 @@ function showTooltip(e,ds,date) {
   tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-30)+'px';
 }
 
-// ── STATS ─────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════════════════════
 function updateStats() {
-  const f=document.getElementById('stats-from').value, t=document.getElementById('stats-to').value;
+  const f=document.getElementById('stats-from').value;
+  const t=document.getElementById('stats-to').value;
   if(!f||!t)return;
   const from=parseDate(f),to=parseDate(t); if(from>to)return;
   let dayS=0,nightS=0,hours=0; const cur=new Date(from);
   while(cur<=to){
     const ds=fmtDate(cur),shift=getShiftForDate(ds);
-    if(shift==='day'){dayS++;hours+=getHours('day',ds);}
-    if(shift==='night'){nightS++;hours+=getHours('night',ds);}
+    if(shift==='day')   {dayS++;  hours+=getHours('day',ds);}
+    if(shift==='night') {nightS++;hours+=getHours('night',ds);}
     cur.setDate(cur.getDate()+1);
   }
-  document.getElementById('stat-day-shifts').textContent=dayS;
-  document.getElementById('stat-night-shifts').textContent=nightS;
-  document.getElementById('stat-total-shifts').textContent=dayS+nightS;
-  document.getElementById('stat-hours').textContent=hours;
+  document.getElementById('stat-day-shifts').textContent  = dayS;
+  document.getElementById('stat-night-shifts').textContent= nightS;
+  document.getElementById('stat-total-shifts').textContent= dayS+nightS;
+  document.getElementById('stat-hours').textContent       = hours;
 }
 
-// ── COLORS ────────────────────────────────────
-function setColor(varName,value,previewId,legendId){
-  document.documentElement.style.setProperty(`--${varName}`,value);
-  document.getElementById(previewId).style.background=value;
-  if(legendId)document.getElementById(legendId).style.background=value;
-  if(varName==='day-color'){const l=getLum(value);document.documentElement.style.setProperty('--day-text',l>0.4?'#0e0e0f':'#e8e8ea');}
-  if(varName==='night-color'){const l=getLum(value);document.documentElement.style.setProperty('--night-text',l>0.4?'#0e0e0f':'#e8e8ea');}
+// ══════════════════════════════════════════════════════
+//  COLORS
+// ══════════════════════════════════════════════════════
+function setColor(varName,value,previewId,legendId) {
+  applyColorVar(varName,value,previewId,legendId,varName==='day-color'?'day-color-in':varName==='night-color'?'night-color-in':'off-color-in');
   renderPatternEditor();
+  scheduleSave();
 }
 function getLum(h){
   const r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;
