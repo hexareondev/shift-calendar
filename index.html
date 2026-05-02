@@ -6,340 +6,329 @@
 <title>Shift — Календарь смен</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Unbounded:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0e0e0f; --surface: #161618; --surface2: #1e1e21;
+  --border: #2a2a2e; --text: #e8e8ea; --muted: #6b6b72;
+  --radius: 10px; --radius-sm: 6px;
+  --tr: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+html { font-size: 15px; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; display: flex; flex-direction: column; }
 
-  :root {
-    --bg: #0e0e0f;
-    --surface: #161618;
-    --surface2: #1e1e21;
-    --border: #2a2a2e;
-    --text: #e8e8ea;
-    --muted: #6b6b72;
-    --day-color: #4ade80;
-    --night-color: #818cf8;
-    --off-color: #2a2a2e;
-    --day-text: #0e0e0f;
-    --night-text: #0e0e0f;
-    --radius: 10px;
-    --radius-sm: 6px;
-    --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
-  }
+/* HEADER */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 32px; border-bottom: 1px solid var(--border);
+  background: var(--bg); position: sticky; top: 0; z-index: 200;
+}
+.logo { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 1rem; letter-spacing: -0.02em; }
+.logo span { color: var(--muted); font-weight: 300; }
+.header-right { display: flex; gap: 8px; align-items: center; }
+.ghost-btn {
+  padding: 5px 13px; background: transparent; border: 1px solid var(--border);
+  color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem;
+  cursor: pointer; border-radius: 20px; transition: var(--tr);
+}
+.ghost-btn:hover { border-color: var(--muted); color: var(--text); }
+.save-badge { font-size: 0.62rem; color: var(--muted); opacity: 0; transition: opacity 0.4s; }
+.save-badge.show { opacity: 1; }
 
-  html { font-size: 15px; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+/* CALENDAR */
+.calendar-section {
+  padding: 22px 32px 18px; background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center;
+}
+.cal-nav-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+  width: 100%; max-width: 840px;
+}
+.cal-nav { display: flex; align-items: center; gap: 10px; }
+.cal-nav-btn {
+  width: 30px; height: 30px; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center; transition: var(--tr);
+}
+.cal-nav-btn:hover { background: var(--surface2); border-color: var(--muted); }
+.cal-month-title {
+  font-family: 'Unbounded', sans-serif; font-size: 1.05rem; font-weight: 300;
+  letter-spacing: -0.02em; min-width: 180px; text-align: center;
+}
+.cal-legend { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.64rem; color: var(--muted); }
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
-  /* ── HEADER ─────────────────────────── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 32px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    z-index: 200;
-  }
-  .logo { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: 1.05rem; letter-spacing: -0.02em; }
-  .logo span { color: var(--muted); font-weight: 300; }
-  .header-right { display: flex; gap: 8px; align-items: center; }
-  .ghost-btn {
-    padding: 6px 14px; background: transparent; border: 1px solid var(--border);
-    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.7rem;
-    cursor: pointer; border-radius: 20px; transition: var(--transition);
-  }
-  .ghost-btn:hover { border-color: var(--muted); color: var(--text); }
+.cal-wrap { max-width: 840px; width: 100%; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 4px; }
+.cal-weekday { text-align: center; font-size: 0.6rem; letter-spacing: 0.08em; color: var(--muted); padding: 2px 0; text-transform: uppercase; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
 
-  /* save indicator */
-  .save-badge {
-    font-size: 0.65rem;
-    color: var(--muted);
-    opacity: 0;
-    transition: opacity 0.4s;
-    white-space: nowrap;
-  }
-  .save-badge.show { opacity: 1; }
+.cal-cell {
+  aspect-ratio: 1; border-radius: var(--radius-sm);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; transition: transform var(--tr);
+  user-select: none; border: 1px solid transparent; overflow: hidden;
+}
+.cal-cell:hover { transform: scale(1.06); z-index: 2; }
+.cal-cell.other-month { opacity: 0.16; cursor: default; pointer-events: none; }
+.cal-cell.today-cell { border-color: rgba(255,255,255,0.35) !important; }
+.cal-cell.c-off { background: var(--surface2); }
 
-  /* ── CALENDAR SECTION ───────────────── */
-  .calendar-section {
-    padding: 24px 32px 20px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+.cell-num { font-family: 'Unbounded', sans-serif; font-size: 0.82rem; font-weight: 400; color: var(--text); line-height: 1; position: relative; z-index: 1; }
+.cell-type { font-size: 0.44rem; letter-spacing: 0.05em; color: var(--muted); margin-top: 2px; text-transform: uppercase; position: relative; z-index: 1; }
 
-  .cal-nav-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
-    gap: 12px;
-    width: 100%;
-    max-width: 840px;
-  }
-  .cal-nav { display: flex; align-items: center; gap: 12px; }
-  .cal-nav-btn {
-    width: 32px; height: 32px;
-    background: var(--surface); border: 1px solid var(--border); color: var(--text);
-    border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem;
-    display: flex; align-items: center; justify-content: center;
-    transition: var(--transition);
-  }
-  .cal-nav-btn:hover { background: var(--surface2); border-color: var(--muted); }
-  .cal-month-title {
-    font-family: 'Unbounded', sans-serif; font-size: 1.1rem; font-weight: 300;
-    letter-spacing: -0.02em; min-width: 190px; text-align: center;
-  }
-  .cal-legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.67rem; color: var(--muted); }
-  .legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+/* Multi-profile stripe overlay */
+.cell-stripes { position: absolute; inset: 0; display: flex; pointer-events: none; }
+.cell-stripe { flex: 1; }
 
-  /* ── CALENDAR GRID ──────────────────── */
-  /* Fixed-width container so the grid never stretches absurdly wide */
-  .cal-wrap {
-    max-width: 840px;
-    width: 100%;
-  }
-  .cal-weekdays {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    gap: 4px; margin-bottom: 4px;
-  }
-  .cal-weekday {
-    text-align: center; font-size: 0.61rem; letter-spacing: 0.1em;
-    color: var(--muted); padding: 3px 0; text-transform: uppercase;
-  }
-  .cal-grid {
-    display: grid; grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-  }
-  .cal-cell {
-    aspect-ratio: 1;
-    border-radius: var(--radius-sm);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; position: relative;
-    transition: transform var(--transition);
-    user-select: none;
-    border: 1px solid transparent;
-  }
-  .cal-cell:hover { transform: scale(1.06); z-index: 2; }
-  .cal-cell.other-month { opacity: 0.18; cursor: default; pointer-events: none; }
-  .cal-cell.today-cell { border-color: var(--muted) !important; }
+/* Overlap badge */
+.overlap-badge {
+  position: absolute; bottom: 3px; right: 3px;
+  font-size: 0.48rem; color: rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.25); border-radius: 3px; padding: 1px 3px;
+  line-height: 1.2; pointer-events: none;
+}
 
-  .cal-cell.off         { background: var(--off-color); }
-  .cal-cell.day-shift   { background: var(--day-color); }
-  .cal-cell.night-shift { background: var(--night-color); }
+/* SETTINGS */
+.settings-panel { background: var(--surface); border-top: 1px solid var(--border); }
+.panel-toggle {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 11px 32px; background: transparent; border: none;
+  border-bottom: 1px solid transparent; color: var(--muted);
+  font-family: 'DM Mono', monospace; font-size: 0.7rem;
+  cursor: pointer; transition: var(--tr); letter-spacing: 0.04em;
+}
+.panel-toggle:hover { color: var(--text); background: var(--surface2); }
+.panel-toggle.open { border-bottom-color: var(--border); }
+.toggle-arrow { transition: transform var(--tr); font-size: 0.58rem; }
+.panel-toggle.open .toggle-arrow { transform: rotate(180deg); }
 
-  .cal-cell.day-shift   .cell-num  { color: var(--day-text); }
-  .cal-cell.night-shift .cell-num  { color: var(--night-text); }
-  .cal-cell.day-shift   .cell-type { color: var(--day-text);   opacity: 0.65; }
-  .cal-cell.night-shift .cell-type { color: var(--night-text); opacity: 0.65; }
+.panel-body {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  overflow: hidden; max-height: 0;
+  transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.panel-body.open { max-height: 1200px; }
+.panel-col { padding: 20px; border-right: 1px solid var(--border); }
+.panel-col:last-child { border-right: none; }
+.section-title {
+  font-family: 'Unbounded', sans-serif; font-size: 0.54rem; font-weight: 400;
+  letter-spacing: 0.13em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
+}
 
-  .hybrid-badge {
-    position: absolute; top: 4px; right: 4px;
-    width: 5px; height: 5px; border-radius: 50%;
-    background: #fb923c; box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
-  }
-  .cell-num  { font-family: 'Unbounded', sans-serif; font-size: 0.85rem; font-weight: 400; color: var(--text); line-height: 1; }
-  .cell-type { font-size: 0.48rem; letter-spacing: 0.06em; color: var(--muted); margin-top: 3px; text-transform: uppercase; }
+/* PROFILES LIST */
+.profiles-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+.profile-row {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; transition: var(--tr);
+}
+.profile-row.active-profile { border-color: var(--muted); }
+.profile-header {
+  display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+  cursor: pointer; user-select: none;
+}
+.profile-header:hover { background: rgba(255,255,255,0.03); }
+.p-accent-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; cursor: pointer; }
+.p-name-input {
+  flex: 1; background: transparent; border: none; color: var(--text);
+  font-family: 'DM Mono', monospace; font-size: 0.78rem; outline: none; cursor: pointer;
+  min-width: 0;
+}
+.p-name-input:focus { cursor: text; }
+.p-chevron { color: var(--muted); font-size: 0.6rem; transition: transform var(--tr); flex-shrink: 0; }
+.p-chevron.open { transform: rotate(180deg); }
+.p-delete-btn {
+  background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.75rem;
+  padding: 2px 4px; border-radius: 4px; transition: var(--tr); flex-shrink: 0;
+}
+.p-delete-btn:hover { color: #f87171; background: rgba(248,113,113,0.1); }
+.p-show-btn {
+  background: none; border: none; font-size: 0.68rem; cursor: pointer;
+  padding: 2px 6px; border-radius: 4px; transition: var(--tr); flex-shrink: 0;
+  font-family: 'DM Mono', monospace;
+}
+.p-show-btn.on { color: var(--text); border: 1px solid var(--border); }
+.p-show-btn.off { color: var(--muted); border: 1px dashed var(--border); opacity: 0.5; }
 
-  /* ── SETTINGS PANEL ─────────────────── */
-  .settings-panel { background: var(--surface); border-top: 1px solid var(--border); }
+.profile-body { display: none; padding: 0 12px 12px; }
+.profile-body.open { display: flex; flex-direction: column; gap: 9px; }
 
-  .panel-toggle {
-    width: 100%; display: flex; align-items: center; justify-content: center;
-    gap: 8px; padding: 12px 32px; background: transparent; border: none;
-    border-bottom: 1px solid transparent; color: var(--muted);
-    font-family: 'DM Mono', monospace; font-size: 0.72rem;
-    cursor: pointer; transition: var(--transition); letter-spacing: 0.05em;
-  }
-  .panel-toggle:hover { color: var(--text); background: var(--surface2); }
-  .panel-toggle.open { border-bottom-color: var(--border); }
-  .toggle-arrow { transition: transform var(--transition); font-size: 0.6rem; }
-  .panel-toggle.open .toggle-arrow { transform: rotate(180deg); }
+.sub-tabs { display: flex; background: var(--bg); border-radius: var(--radius-sm); padding: 3px; gap: 2px; margin-bottom: 4px; }
+.sub-tab {
+  flex: 1; padding: 5px 3px; border: none; background: transparent;
+  color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  cursor: pointer; border-radius: 3px; transition: var(--tr); white-space: nowrap;
+}
+.sub-tab.active { background: var(--border); color: var(--text); }
 
-  .panel-body {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1);
-  }
-  .panel-body.open { max-height: 900px; }
+.field-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.field-label { font-size: 0.7rem; color: var(--muted); white-space: nowrap; }
+.field-input {
+  background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  font-family: 'DM Mono', monospace; font-size: 0.76rem; padding: 5px 7px;
+  border-radius: var(--radius-sm); width: 80px; text-align: center; outline: none;
+  transition: border-color var(--tr);
+}
+.field-input:focus { border-color: var(--muted); }
+input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
+.date-input {
+  background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  font-family: 'DM Mono', monospace; font-size: 0.7rem; padding: 5px 7px;
+  border-radius: var(--radius-sm); outline: none; cursor: pointer; transition: border-color var(--tr);
+}
+.date-input:focus { border-color: var(--muted); }
+input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+input[type=color] { display: none; }
+.preset-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.preset-btn {
+  padding: 3px 8px; background: var(--bg); border: 1px solid var(--border);
+  color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  cursor: pointer; border-radius: 20px; transition: var(--tr);
+}
+.preset-btn:hover { border-color: var(--muted); color: var(--text); }
 
-  .panel-col {
-    padding: 22px 22px;
-    border-right: 1px solid var(--border);
-  }
-  .panel-col:last-child { border-right: none; }
+.apply-btn {
+  width: 100%; padding: 7px; background: var(--text); color: var(--bg); border: none;
+  font-family: 'Unbounded', sans-serif; font-size: 0.58rem; font-weight: 600;
+  letter-spacing: 0.06em; cursor: pointer; border-radius: var(--radius-sm);
+  transition: opacity var(--tr); margin-top: 2px;
+}
+.apply-btn:hover { opacity: 0.85; }
+.clear-btn {
+  width: 100%; padding: 5px; background: transparent; color: var(--muted);
+  border: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  cursor: pointer; border-radius: var(--radius-sm); transition: var(--tr);
+}
+.clear-btn:hover { border-color: var(--muted); color: var(--text); }
 
-  .section-title {
-    font-family: 'Unbounded', sans-serif; font-size: 0.56rem; font-weight: 400;
-    letter-spacing: 0.13em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
-  }
+.add-profile-btn {
+  width: 100%; padding: 8px; background: transparent; border: 1px dashed var(--border);
+  color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.7rem;
+  cursor: pointer; border-radius: var(--radius-sm); transition: var(--tr);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.add-profile-btn:hover { border-color: var(--muted); color: var(--text); }
 
-  /* ── SCHEDULE ───────────────────────── */
-  .schedule-type-tabs {
-    display: flex; background: var(--surface2); border-radius: var(--radius-sm);
-    padding: 3px; gap: 3px; margin-bottom: 14px;
-  }
-  .tab-btn {
-    flex: 1; padding: 6px 4px; border: none; background: transparent;
-    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.66rem;
-    cursor: pointer; border-radius: 4px; transition: var(--transition); white-space: nowrap;
-  }
-  .tab-btn.active { background: var(--border); color: var(--text); }
+/* Hybrid pattern */
+.pattern-wrap { display: flex; flex-direction: column; gap: 5px; }
+.pattern-label { font-size: 0.64rem; color: var(--muted); }
+.pattern-editor { display: flex; gap: 3px; flex-wrap: wrap; align-items: center; }
+.pattern-slot {
+  width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 0.58rem;
+  cursor: pointer; transition: var(--tr); user-select: none; flex-shrink: 0;
+}
+.pattern-slot:hover { transform: scale(1.15); z-index: 2; }
+.pattern-slot.slot-off { background: var(--bg); color: var(--muted); }
+.pattern-add-btn {
+  width: 24px; height: 24px; border-radius: 4px; border: 1px dashed var(--border);
+  background: transparent; color: var(--muted); font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: var(--tr); flex-shrink: 0;
+}
+.pattern-add-btn:hover { border-color: var(--muted); color: var(--text); }
+.pattern-hint { font-size: 0.56rem; color: var(--muted); }
 
-  .shift-config { display: flex; flex-direction: column; gap: 9px; }
-  .field-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .field-label { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
-  .field-input {
-    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
-    font-family: 'DM Mono', monospace; font-size: 0.78rem; padding: 5px 8px;
-    border-radius: var(--radius-sm); width: 80px; text-align: center; outline: none;
-    transition: border-color var(--transition);
-  }
-  .field-input:focus { border-color: var(--muted); }
-  input[type=number]::-webkit-inner-spin-button { opacity: 0.4; }
+/* Color row inside profile */
+.color-swatch-row { display: flex; gap: 6px; }
+.color-chip { width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--border); cursor: pointer; transition: transform var(--tr); flex-shrink: 0; }
+.color-chip:hover { transform: scale(1.1); }
+.color-chip-label { font-size: 0.6rem; color: var(--muted); margin-top: 2px; text-align: center; }
 
-  .date-input {
-    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
-    font-family: 'DM Mono', monospace; font-size: 0.72rem; padding: 5px 8px;
-    border-radius: var(--radius-sm); outline: none; cursor: pointer;
-    transition: border-color var(--transition);
-  }
-  .date-input:focus { border-color: var(--muted); }
-  input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+/* STATS COL */
+.stats-range { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; }
+.stats-range .date-input { flex: 1; }
+.stats-sep { color: var(--muted); font-size: 0.68rem; }
+.stats-sel {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  font-family: 'DM Mono', monospace; font-size: 0.7rem; padding: 5px 7px;
+  border-radius: var(--radius-sm); outline: none; margin-bottom: 10px; cursor: pointer;
+}
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 10px; }
+.stat-val { font-family: 'Unbounded', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text); line-height: 1; margin-bottom: 3px; }
+.stat-lbl { font-size: 0.59rem; color: var(--muted); }
 
-  .preset-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
-  .preset-btn {
-    padding: 4px 9px; background: var(--surface2); border: 1px solid var(--border);
-    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.65rem;
-    cursor: pointer; border-radius: 20px; transition: var(--transition);
-  }
-  .preset-btn:hover { border-color: var(--muted); color: var(--text); }
-  .preset-btn.active { border-color: var(--text); color: var(--text); background: var(--border); }
+/* TIPS COL */
+.tips { display: flex; flex-direction: column; gap: 9px; }
+.tip-group-title { color: var(--text); font-size: 0.7rem; margin-bottom: 4px; }
+.tip-line { font-size: 0.67rem; color: var(--muted); line-height: 1.7; }
+.tip-sep { height: 1px; background: var(--border); }
 
-  .apply-btn {
-    width: 100%; padding: 8px; background: var(--text); color: var(--bg); border: none;
-    font-family: 'Unbounded', sans-serif; font-size: 0.62rem; font-weight: 600;
-    letter-spacing: 0.06em; cursor: pointer; border-radius: var(--radius-sm);
-    transition: opacity var(--transition); margin-top: 2px;
-  }
-  .apply-btn:hover { opacity: 0.85; }
-  .clear-btn {
-    width: 100%; padding: 6px; background: transparent; color: var(--muted);
-    border: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 0.65rem;
-    cursor: pointer; border-radius: var(--radius-sm); transition: var(--transition);
-  }
-  .clear-btn:hover { border-color: var(--muted); color: var(--text); }
+/* EXPORT */
+.export-btn {
+  width: 100%; padding: 7px; background: transparent; border: 1px solid var(--border);
+  color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.67rem;
+  cursor: pointer; border-radius: var(--radius-sm); transition: var(--tr);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.export-btn:hover { border-color: var(--muted); color: var(--text); }
 
-  /* ── HYBRID PATTERN ─────────────────── */
-  .pattern-wrap { display: flex; flex-direction: column; gap: 7px; }
-  .pattern-label { font-size: 0.68rem; color: var(--muted); }
-  .pattern-editor { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
-  .pattern-slot {
-    width: 28px; height: 28px; border-radius: 5px; border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center; font-size: 0.62rem;
-    cursor: pointer; transition: var(--transition); user-select: none; flex-shrink: 0;
-  }
-  .pattern-slot:hover { transform: scale(1.12); z-index: 2; }
-  .slot-day   { background: var(--day-color);   color: var(--day-text);   border-color: var(--day-color); }
-  .slot-night { background: var(--night-color); color: var(--night-text); border-color: var(--night-color); }
-  .slot-off   { background: var(--surface2); color: var(--muted); }
-  .pattern-add-btn {
-    width: 28px; height: 28px; border-radius: 5px; border: 1px dashed var(--border);
-    background: transparent; color: var(--muted); font-size: 1.1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: var(--transition); flex-shrink: 0; line-height: 1;
-  }
-  .pattern-add-btn:hover { border-color: var(--muted); color: var(--text); }
-  .pattern-hint { font-size: 0.6rem; color: var(--muted); }
+/* Context menu */
+.ctx-menu {
+  position: fixed; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 6px; z-index: 1000; min-width: 165px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5); animation: fadeIn 0.12s ease; display: none;
+}
+@keyframes fadeIn { from{opacity:0;transform:scale(0.95) translateY(-4px);}to{opacity:1;transform:none;} }
+.ctx-menu.visible { display: block; }
+.ctx-item { padding: 7px 11px; font-size: 0.72rem; color: var(--text); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 7px; transition: background var(--tr); }
+.ctx-item:hover { background: var(--surface2); }
+.ctx-icon { font-size: 0.8rem; width: 15px; text-align: center; }
+.ctx-sep { height: 1px; background: var(--border); margin: 3px 0; }
 
-  /* ── COLORS ─────────────────────────── */
-  .color-grid { display: flex; flex-direction: column; gap: 10px; }
-  .color-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .color-label { font-size: 0.72rem; color: var(--muted); }
-  .color-preview {
-    width: 26px; height: 26px; border-radius: var(--radius-sm);
-    border: 1px solid var(--border); cursor: pointer;
-    transition: transform var(--transition); flex-shrink: 0;
-  }
-  .color-preview:hover { transform: scale(1.1); }
-  input[type=color] { display: none; }
+/* Tooltip */
+.tooltip { position: fixed; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 9px; font-size: 0.65rem; color: var(--muted); pointer-events: none; z-index: 999; display: none; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 
-  /* ── STATS ──────────────────────────── */
-  .stats-range { display: flex; gap: 6px; margin-bottom: 12px; align-items: center; }
-  .stats-range .date-input { flex: 1; }
-  .stats-sep { color: var(--muted); font-size: 0.7rem; }
-  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-  .stat-card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 10px 12px;
-  }
-  .stat-val {
-    font-family: 'Unbounded', sans-serif; font-size: 1.25rem; font-weight: 600;
-    color: var(--text); line-height: 1; margin-bottom: 4px;
-  }
-  .stat-lbl { font-size: 0.62rem; color: var(--muted); }
+/* Export modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.visible { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; max-width: 900px; width: 100%; max-height: 80vh;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-family: 'Unbounded', sans-serif; font-size: 0.75rem; font-weight: 400; letter-spacing: -0.01em; }
+.modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; transition: color var(--tr); }
+.modal-close:hover { color: var(--text); }
+.modal-actions { display: flex; gap: 8px; }
+.modal-btn {
+  padding: 7px 14px; background: transparent; border: 1px solid var(--border);
+  color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.68rem;
+  cursor: pointer; border-radius: var(--radius-sm); transition: var(--tr);
+}
+.modal-btn:hover { border-color: var(--muted); color: var(--text); }
+.modal-btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+.modal-btn.primary:hover { opacity: 0.85; }
+.export-table-wrap { overflow: auto; flex: 1; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.export-table { border-collapse: collapse; font-size: 0.65rem; white-space: nowrap; }
+.export-table th, .export-table td { border: 1px solid var(--border); padding: 5px 8px; text-align: center; }
+.export-table th { background: var(--surface2); color: var(--muted); font-weight: 400; font-family: 'Unbounded', sans-serif; font-size: 0.56rem; letter-spacing: 0.05em; position: sticky; top: 0; z-index: 2; }
+.export-table td:first-child { background: var(--surface2); color: var(--text); text-align: left; padding-left: 12px; position: sticky; left: 0; z-index: 1; }
+.export-table th:first-child { z-index: 3; }
+.export-table .cell-d { background: rgba(74,222,128,0.2); color: #4ade80; }
+.export-table .cell-n { background: rgba(129,140,248,0.2); color: #818cf8; }
+.export-table .cell-o { color: var(--muted); }
+.export-table .cell-overlap { background: rgba(245,158,11,0.2); color: #f59e0b; }
 
-  /* ── TIPS COL ───────────────────────── */
-  .tips { display: flex; flex-direction: column; gap: 10px; }
-  .tip-group-title { color: var(--text); font-size: 0.72rem; margin-bottom: 5px; }
-  .tip-line { font-size: 0.7rem; color: var(--muted); line-height: 1.7; }
-  .tip-sep { height: 1px; background: var(--border); }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* ── CONTEXT MENU ───────────────────── */
-  .ctx-menu {
-    position: fixed; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 6px; z-index: 1000; min-width: 170px;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.5); animation: fadeIn 0.12s ease; display: none;
-  }
-  @keyframes fadeIn { from{opacity:0;transform:scale(0.95) translateY(-4px);}to{opacity:1;transform:none;} }
-  .ctx-menu.visible { display: block; }
-  .ctx-item {
-    padding: 8px 12px; font-size: 0.74rem; color: var(--text); cursor: pointer;
-    border-radius: var(--radius-sm); display: flex; align-items: center; gap: 8px;
-    transition: background var(--transition);
-  }
-  .ctx-item:hover { background: var(--surface2); }
-  .ctx-icon { font-size: 0.82rem; width: 16px; text-align: center; }
-  .ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
-
-  /* ── TOOLTIP ────────────────────────── */
-  .tooltip {
-    position: fixed; background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 6px 10px; font-size: 0.67rem; color: var(--muted);
-    pointer-events: none; z-index: 999; display: none; white-space: nowrap;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  @media (max-width: 1100px) {
-    .panel-body { grid-template-columns: 1fr 1fr; }
-    .panel-col { border-bottom: 1px solid var(--border); }
-    .panel-col:nth-child(2n) { border-right: none; }
-  }
-  @media (max-width: 680px) {
-    .calendar-section { padding: 16px 14px 14px; }
-    .panel-body { grid-template-columns: 1fr; }
-    .panel-col { border-right: none; }
-    header { padding: 14px 16px; }
-    .cell-type { display: none; }
-    .cal-legend { display: none; }
-  }
+@media (max-width: 1100px) {
+  .panel-body { grid-template-columns: 1fr 1fr; }
+  .panel-col { border-bottom: 1px solid var(--border); }
+  .panel-col:nth-child(2n) { border-right: none; }
+}
+@media (max-width: 680px) {
+  .calendar-section, header { padding-left: 16px; padding-right: 16px; }
+  .panel-body { grid-template-columns: 1fr; }
+  .panel-col { border-right: none; }
+  .cell-type { display: none; }
+  .cal-legend { display: none; }
+}
 </style>
 </head>
 <body>
@@ -352,7 +341,7 @@
   </div>
 </header>
 
-<!-- ═══ CALENDAR ════════════════════════════════ -->
+<!-- CALENDAR -->
 <div class="calendar-section">
   <div class="cal-nav-row">
     <div class="cal-nav">
@@ -360,15 +349,8 @@
       <div class="cal-month-title" id="month-title">—</div>
       <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
     </div>
-    <div class="cal-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--day-color)" id="legend-day"></div><span>Дневная</span></div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--night-color)" id="legend-night"></div><span>Ночная</span></div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--off-color);border:1px solid #3a3a3e" id="legend-off"></div><span>Выходной</span></div>
-      <div class="legend-item"><div class="legend-dot" style="background:transparent;border:1px solid #6b6b72"></div><span>Сегодня</span></div>
-      <div class="legend-item"><div style="width:7px;height:7px;border-radius:50%;background:#fb923c;flex-shrink:0"></div><span>Гибрид</span></div>
-    </div>
+    <div class="cal-legend" id="cal-legend"></div>
   </div>
-  <!-- Grid is constrained to a sane max-width so columns don't spread on wide screens -->
   <div class="cal-wrap">
     <div class="cal-weekdays">
       <div class="cal-weekday">Пн</div><div class="cal-weekday">Вт</div>
@@ -380,133 +362,67 @@
   </div>
 </div>
 
-<!-- ═══ SETTINGS PANEL ══════════════════════════ -->
+<!-- SETTINGS PANEL -->
 <div class="settings-panel">
   <button class="panel-toggle" id="panel-toggle" onclick="togglePanel()">
     <span class="toggle-arrow" id="panel-arrow">▼</span>
     <span id="panel-label">Настройки и статистика</span>
   </button>
-
   <div class="panel-body" id="panel-body">
 
-    <!-- COL 1: SCHEDULE -->
+    <!-- COL 1: PROFILES -->
     <div class="panel-col">
-      <div class="section-title">График смен</div>
-      <div class="schedule-type-tabs">
-        <button class="tab-btn active" onclick="setTab('day',this)">☀ День</button>
-        <button class="tab-btn" onclick="setTab('night',this)">☾ Ночь</button>
-        <button class="tab-btn" onclick="setTab('hybrid',this)">⇄ Гибрид</button>
-      </div>
-
-      <!-- DAY -->
-      <div class="shift-config" id="day-config">
-        <div class="field-row"><span class="field-label">Рабочих дней</span><input class="field-input" type="number" id="day-work" value="2" min="1" max="30"></div>
-        <div class="field-row"><span class="field-label">Выходных дней</span><input class="field-input" type="number" id="day-rest" value="2" min="1" max="30"></div>
-        <div class="field-row"><span class="field-label">Часов в смене</span><input class="field-input" type="number" id="day-hours" value="12" min="1" max="24"></div>
-        <div class="field-row"><span class="field-label">Начало цикла</span><input class="date-input" type="date" id="day-start"></div>
-        <div class="preset-row">
-          <button class="preset-btn" onclick="setPreset('day',2,2,this)">2/2</button>
-          <button class="preset-btn" onclick="setPreset('day',5,2,this)">5/2</button>
-          <button class="preset-btn" onclick="setPreset('day',3,3,this)">3/3</button>
-          <button class="preset-btn" onclick="setPreset('day',4,3,this)">4/3</button>
-          <button class="preset-btn" onclick="setPreset('day',1,3,this)">1/3</button>
-        </div>
-        <button class="apply-btn" onclick="applySchedule('day')">Применить</button>
-        <button class="clear-btn" onclick="clearSchedule('day')">Сбросить</button>
-      </div>
-
-      <!-- NIGHT -->
-      <div class="shift-config" id="night-config" style="display:none">
-        <div class="field-row"><span class="field-label">Рабочих дней</span><input class="field-input" type="number" id="night-work" value="2" min="1" max="30"></div>
-        <div class="field-row"><span class="field-label">Выходных дней</span><input class="field-input" type="number" id="night-rest" value="2" min="1" max="30"></div>
-        <div class="field-row"><span class="field-label">Часов в смене</span><input class="field-input" type="number" id="night-hours" value="12" min="1" max="24"></div>
-        <div class="field-row"><span class="field-label">Начало цикла</span><input class="date-input" type="date" id="night-start"></div>
-        <div class="preset-row">
-          <button class="preset-btn" onclick="setPreset('night',2,2,this)">2/2</button>
-          <button class="preset-btn" onclick="setPreset('night',5,2,this)">5/2</button>
-          <button class="preset-btn" onclick="setPreset('night',3,3,this)">3/3</button>
-          <button class="preset-btn" onclick="setPreset('night',4,3,this)">4/3</button>
-          <button class="preset-btn" onclick="setPreset('night',1,3,this)">1/3</button>
-        </div>
-        <button class="apply-btn" onclick="applySchedule('night')">Применить</button>
-        <button class="clear-btn" onclick="clearSchedule('night')">Сбросить</button>
-      </div>
-
-      <!-- HYBRID -->
-      <div class="shift-config" id="hybrid-config" style="display:none">
-        <div class="pattern-wrap">
-          <div class="pattern-label">Паттерн (клик — тип, ПКМ — удалить):</div>
-          <div class="pattern-editor" id="pattern-editor"></div>
-          <div class="pattern-hint">☀ день · ☾ ночь · ○ выходной</div>
-        </div>
-        <div>
-          <div class="field-label" style="margin-bottom:6px;color:var(--muted)">Пресеты:</div>
-          <div class="preset-row" id="hybrid-presets">
-            <button class="preset-btn" onclick="setHybridPreset([{t:'day'},{t:'night'},{t:'off'},{t:'off'}],this)">Д·Н·2в</button>
-            <button class="preset-btn" onclick="setHybridPreset([{t:'day'},{t:'day'},{t:'night'},{t:'night'},{t:'off'},{t:'off'}],this)">2Д·2Н·2в</button>
-            <button class="preset-btn" onclick="setHybridPreset([{t:'day'},{t:'night'},{t:'night'},{t:'off'}],this)">Д·2Н·1в</button>
-            <button class="preset-btn" onclick="setHybridPreset([{t:'day'},{t:'day'},{t:'night'},{t:'off'},{t:'off'}],this)">2Д·Н·2в</button>
-          </div>
-        </div>
-        <div class="field-row"><span class="field-label">Часов (день)</span><input class="field-input" type="number" id="hybrid-day-hours" value="12" min="1" max="24"></div>
-        <div class="field-row"><span class="field-label">Часов (ночь)</span><input class="field-input" type="number" id="hybrid-night-hours" value="12" min="1" max="24"></div>
-        <div class="field-row"><span class="field-label">Начало цикла</span><input class="date-input" type="date" id="hybrid-start"></div>
-        <button class="apply-btn" onclick="applySchedule('hybrid')">Применить</button>
-        <button class="clear-btn" onclick="clearSchedule('hybrid')">Сбросить</button>
-      </div>
+      <div class="section-title">Профили</div>
+      <div class="profiles-list" id="profiles-list"></div>
+      <button class="add-profile-btn" onclick="addProfile()">+ добавить профиль</button>
     </div>
 
-    <!-- COL 2: COLORS -->
-    <div class="panel-col">
-      <div class="section-title">Цвета</div>
-      <div class="color-grid">
-        <div class="color-row">
-          <span class="color-label">Дневная смена</span>
-          <div class="color-preview" id="day-preview" style="background:var(--day-color)" onclick="document.getElementById('day-color-in').click()"></div>
-          <input type="color" id="day-color-in" value="#4ade80" oninput="setColor('day-color',this.value,'day-preview','legend-day')">
-        </div>
-        <div class="color-row">
-          <span class="color-label">Ночная смена</span>
-          <div class="color-preview" id="night-preview" style="background:var(--night-color)" onclick="document.getElementById('night-color-in').click()"></div>
-          <input type="color" id="night-color-in" value="#818cf8" oninput="setColor('night-color',this.value,'night-preview','legend-night')">
-        </div>
-        <div class="color-row">
-          <span class="color-label">Выходной день</span>
-          <div class="color-preview" id="off-preview" style="background:#2a2a2e" onclick="document.getElementById('off-color-in').click()"></div>
-          <input type="color" id="off-color-in" value="#2a2a2e" oninput="setColor('off-color',this.value,'off-preview','legend-off')">
-        </div>
-      </div>
-    </div>
-
-    <!-- COL 3: STATS -->
+    <!-- COL 2: COLORS & STATS sel -->
     <div class="panel-col">
       <div class="section-title">Статистика</div>
+      <select class="stats-sel" id="stats-profile-sel" onchange="updateStats()">
+      </select>
       <div class="stats-range">
         <input class="date-input" type="date" id="stats-from">
         <span class="stats-sep">—</span>
         <input class="date-input" type="date" id="stats-to">
       </div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-val" id="stat-day-shifts">0</div><div class="stat-lbl">дневных смен</div></div>
-        <div class="stat-card"><div class="stat-val" id="stat-night-shifts">0</div><div class="stat-lbl">ночных смен</div></div>
-        <div class="stat-card"><div class="stat-val" id="stat-total-shifts">0</div><div class="stat-lbl">всего смен</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-day">0</div><div class="stat-lbl">дневных смен</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-night">0</div><div class="stat-lbl">ночных смен</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">всего смен</div></div>
         <div class="stat-card"><div class="stat-val" id="stat-hours">0</div><div class="stat-lbl">рабочих часов</div></div>
       </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div class="section-title" style="margin-bottom:8px">Оплата</div>
+        <div class="field-row" style="margin-bottom:6px"><span class="field-label">День, ₽/ч</span><input class="field-input" type="number" id="rate-day" value="0" min="0" step="10" oninput="updateStats();scheduleSave()"></div>
+        <div class="field-row" style="margin-bottom:10px"><span class="field-label">Ночь, ₽/ч</span><input class="field-input" type="number" id="rate-night" value="0" min="0" step="10" oninput="updateStats();scheduleSave()"></div>
+        <div class="stat-card"><div class="stat-val" id="stat-salary" style="font-size:1.1rem">0 ₽</div><div class="stat-lbl">итого к получению</div></div>
+      </div>
+    </div>
 
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-        <div class="section-title" style="margin-bottom:10px">Расчёт оплаты</div>
-        <div class="field-row" style="margin-bottom:8px">
-          <span class="field-label">Ставка день, ₽/ч</span>
-          <input class="field-input" type="number" id="rate-day" value="0" min="0" step="10" oninput="updateStats();scheduleSave()">
-        </div>
-        <div class="field-row" style="margin-bottom:12px">
-          <span class="field-label">Ставка ночь, ₽/ч</span>
-          <input class="field-input" type="number" id="rate-night" value="0" min="0" step="10" oninput="updateStats();scheduleSave()">
-        </div>
-        <div class="stat-card">
-          <div class="stat-val" id="stat-salary" style="font-size:1.35rem">0 ₽</div>
-          <div class="stat-lbl">итого к получению</div>
-        </div>
+    <!-- COL 3: EXPORT -->
+    <div class="panel-col">
+      <div class="section-title">Экспорт таблицы</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <div class="field-row"><span class="field-label">Период с</span><input class="date-input" type="date" id="exp-from"></div>
+        <div class="field-row"><span class="field-label">Период по</span><input class="date-input" type="date" id="exp-to"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px">
+        <button class="export-btn" onclick="openExport()">📋 Просмотр таблицы</button>
+        <button class="export-btn" onclick="copyTSV()">⎘ Копировать (TSV)</button>
+        <button class="export-btn" onclick="downloadCSV()">↓ Скачать CSV</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
+        <input type="checkbox" id="exp-show-overlap" checked style="accent-color:var(--text);width:13px;height:13px;cursor:pointer">
+        <span style="font-size:0.68rem;color:var(--muted)">Строка совместных выходных</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;margin-top:6px">
+        <input type="checkbox" id="exp-only-visible" checked style="accent-color:var(--text);width:13px;height:13px;cursor:pointer">
+        <span style="font-size:0.68rem;color:var(--muted)">Только видимые профили</span>
+      </label>
+      <div style="margin-top:12px;font-size:0.63rem;color:var(--muted);line-height:1.6">
+        Столбцы — даты, строки — профили.<br>TSV вставляется напрямую в Excel / Google Sheets.
       </div>
     </div>
 
@@ -515,30 +431,24 @@
       <div class="section-title">Управление</div>
       <div class="tips">
         <div>
-          <div class="tip-group-title">Ячейки календаря</div>
+          <div class="tip-group-title">Профили</div>
+          <div class="tip-line">Каждый профиль — отдельный человек. На календаре отображаются полосками все активные профили.</div>
+        </div>
+        <div class="tip-sep"></div>
+        <div>
+          <div class="tip-group-title">Ячейки</div>
           <div class="tip-line">🖱 <b style="color:var(--text)">Клик</b> — сменить тип дня</div>
-          <div class="tip-line">🖱 <b style="color:var(--text)">Правый клик</b> — меню выбора</div>
-          <div class="tip-line">🖱 <b style="color:var(--text)">Наведение</b> — детали дня</div>
+          <div class="tip-line">🖱 <b style="color:var(--text)">ПКМ</b> — меню выбора</div>
+          <div class="tip-line">🖱 <b style="color:var(--text)">Наведение</b> — детали</div>
         </div>
         <div class="tip-sep"></div>
         <div>
-          <div class="tip-group-title">Приоритеты</div>
-          <div class="tip-line">1. Ручной выбор <span style="color:var(--text)">✎</span></div>
-          <div class="tip-line">2. Гибридный график</div>
-          <div class="tip-line">3. Дневной / ночной</div>
+          <div class="tip-group-title">Пересечения</div>
+          <div class="tip-line">Когда несколько профилей активны, ячейка делится на цветные полосы. Наведи, чтобы увидеть кто работает.</div>
         </div>
         <div class="tip-sep"></div>
         <div>
-          <div class="tip-group-title">Гибридный паттерн</div>
-          <div class="tip-line">ЛКМ по слоту — сменить тип</div>
-          <div class="tip-line">ПКМ по слоту — удалить</div>
-          <div class="tip-line">+ — добавить слот</div>
-        </div>
-        <div class="tip-sep"></div>
-        <div>
-          <div class="tip-group-title">Сохранение</div>
-          <div class="tip-line">Данные автоматически сохраняются в браузере при каждом изменении.</div>
-          <button class="clear-btn" style="margin-top:8px" onclick="clearAllData()">🗑 Сбросить всё</button>
+          <button class="clear-btn" onclick="clearAllData()">🗑 Сбросить всё</button>
         </div>
       </div>
     </div>
@@ -546,6 +456,7 @@
   </div>
 </div>
 
+<!-- CTX MENU -->
 <div class="ctx-menu" id="ctx-menu">
   <div class="ctx-item" onclick="ctxSet('day')"><span class="ctx-icon">☀</span> Дневная смена</div>
   <div class="ctx-item" onclick="ctxSet('night')"><span class="ctx-icon">☾</span> Ночная смена</div>
@@ -555,484 +466,816 @@
 </div>
 <div class="tooltip" id="tooltip"></div>
 
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Таблица смен</div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="copyTSV()">⎘ Копировать TSV</button>
+        <button class="modal-btn primary" onclick="downloadCSV()">↓ CSV</button>
+        <button class="modal-close" onclick="closeExport()">✕</button>
+      </div>
+    </div>
+    <div class="export-table-wrap">
+      <table class="export-table" id="export-table"></table>
+    </div>
+  </div>
+</div>
+
 <script>
-// ══════════════════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════
+const STORAGE_KEY = 'shiftcal_v4';
 const today = new Date(); today.setHours(0,0,0,0);
+const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const PALETTE = ['#4ade80','#818cf8','#fb923c','#f472b6','#38bdf8','#a3e635','#facc15','#e879f9'];
+const NIGHT_PALETTE = ['#16a34a','#4f46e5','#ea580c','#db2777','#0284c7','#65a30d','#ca8a04','#a21caf'];
+
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
 let viewYear  = today.getFullYear();
 let viewMonth = today.getMonth();
-let manualOverrides = {};  // { "YYYY-MM-DD": "day"|"night"|"off" }
-let schedules = { day: null, night: null, hybrid: null };
-let hybridPattern = [{t:'day'},{t:'night'},{t:'off'},{t:'off'}];
-let ctxTargetDate = null;
 let panelOpen = false;
-const STORAGE_KEY = 'shiftcal_v1';
+let ctxDate   = null;
+let ctxProfileId = null; // which profile the ctx menu targets
 
-// ══════════════════════════════════════════════════════
-//  PERSISTENCE — localStorage
-// ══════════════════════════════════════════════════════
-function saveState() {
-  const colors = {
-    day:   document.getElementById('day-color-in').value,
-    night: document.getElementById('night-color-in').value,
-    off:   document.getElementById('off-color-in').value,
+// Profile: { id, name, visible, dayColor, nightColor, offColor,
+//            schedules:{day,night,hybrid}, manualOverrides, hybridPattern,
+//            openInPanel }
+let profiles = [];
+let nextId = 1;
+
+function mkProfile(name, idx) {
+  return {
+    id: nextId++, name,
+    visible: true,
+    dayColor:   PALETTE[idx % PALETTE.length],
+    nightColor: NIGHT_PALETTE[idx % NIGHT_PALETTE.length],
+    offColor:   '#1e1e21',
+    schedules: { day: null, night: null, hybrid: null },
+    manualOverrides: {},
+    hybridPattern: [{t:'day'},{t:'night'},{t:'off'},{t:'off'}],
+    openInPanel: true,
+    activeTab: 'day',
+    rateDay: 0, rateNight: 0,
   };
-
-  // Serialise schedules: convert startDate (Date obj) → string
-  const serSched = {};
-  for (const [k, s] of Object.entries(schedules)) {
-    if (!s) { serSched[k] = null; continue; }
-    serSched[k] = { ...s, startDate: fmtDate(s.startDate) };
-  }
-
-  const state = {
-    viewYear, viewMonth,
-    manualOverrides,
-    schedules: serSched,
-    hybridPattern,
-    panelOpen,
-    colors,
-    statsFrom: document.getElementById('stats-from').value,
-    statsTo:   document.getElementById('stats-to').value,
-    // form fields (for display when restored)
-    fields: {
-      dayWork:   document.getElementById('day-work').value,
-      dayRest:   document.getElementById('day-rest').value,
-      dayHours:  document.getElementById('day-hours').value,
-      dayStart:  document.getElementById('day-start').value,
-      nightWork: document.getElementById('night-work').value,
-      nightRest: document.getElementById('night-rest').value,
-      nightHours:document.getElementById('night-hours').value,
-      nightStart:document.getElementById('night-start').value,
-      hybridDayHours:   document.getElementById('hybrid-day-hours').value,
-      hybridNightHours: document.getElementById('hybrid-night-hours').value,
-      hybridStart:      document.getElementById('hybrid-start').value,
-      rateDay:          document.getElementById('rate-day').value,
-      rateNight:        document.getElementById('rate-night').value,
-    }
-  };
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    flashSaved();
-  } catch(e) { /* quota exceeded or private mode */ }
 }
 
-function loadState() {
-  let raw;
-  try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return false; }
-  if (!raw) return false;
-  try {
-    const s = JSON.parse(raw);
-
-    // View
-    viewYear  = s.viewYear  ?? today.getFullYear();
-    viewMonth = s.viewMonth ?? today.getMonth();
-
-    // Overrides
-    manualOverrides = s.manualOverrides ?? {};
-
-    // Hybrid pattern
-    hybridPattern = s.hybridPattern ?? [{t:'day'},{t:'night'},{t:'off'},{t:'off'}];
-
-    // Schedules (restore startDate strings → Date objects)
-    schedules = { day: null, night: null, hybrid: null };
-    for (const [k, sc] of Object.entries(s.schedules ?? {})) {
-      if (!sc) continue;
-      schedules[k] = { ...sc, startDate: parseDate(sc.startDate) };
-    }
-
-    // Panel
-    panelOpen = s.panelOpen ?? false;
-
-    // Colors
-    if (s.colors) {
-      applyColorVar('day-color',   s.colors.day,   'day-preview',   'legend-day',   'day-color-in');
-      applyColorVar('night-color', s.colors.night, 'night-preview', 'legend-night', 'night-color-in');
-      applyColorVar('off-color',   s.colors.off,   'off-preview',   'legend-off',   'off-color-in');
-    }
-
-    // Stats range
-    if (s.statsFrom) document.getElementById('stats-from').value = s.statsFrom;
-    if (s.statsTo)   document.getElementById('stats-to').value   = s.statsTo;
-
-    // Form fields
-    const f = s.fields ?? {};
-    if (f.dayWork)         document.getElementById('day-work').value          = f.dayWork;
-    if (f.dayRest)         document.getElementById('day-rest').value          = f.dayRest;
-    if (f.dayHours)        document.getElementById('day-hours').value         = f.dayHours;
-    if (f.dayStart)        document.getElementById('day-start').value         = f.dayStart;
-    if (f.nightWork)       document.getElementById('night-work').value        = f.nightWork;
-    if (f.nightRest)       document.getElementById('night-rest').value        = f.nightRest;
-    if (f.nightHours)      document.getElementById('night-hours').value       = f.nightHours;
-    if (f.nightStart)      document.getElementById('night-start').value       = f.nightStart;
-    if (f.hybridDayHours)  document.getElementById('hybrid-day-hours').value  = f.hybridDayHours;
-    if (f.hybridNightHours)document.getElementById('hybrid-night-hours').value= f.hybridNightHours;
-    if (f.hybridStart)     document.getElementById('hybrid-start').value      = f.hybridStart;
-    if (f.rateDay)         document.getElementById('rate-day').value          = f.rateDay;
-    if (f.rateNight)       document.getElementById('rate-night').value        = f.rateNight;
-
-    return true;
-  } catch(e) { return false; }
-}
-
-function applyColorVar(varName, value, previewId, legendId, inputId) {
-  if (!value) return;
-  document.documentElement.style.setProperty(`--${varName}`, value);
-  document.getElementById(previewId).style.background = value;
-  if (legendId) document.getElementById(legendId).style.background = value;
-  document.getElementById(inputId).value = value;
-  // text contrast
-  if (varName === 'day-color') {
-    document.documentElement.style.setProperty('--day-text', getLum(value)>0.4?'#0e0e0f':'#e8e8ea');
-  }
-  if (varName === 'night-color') {
-    document.documentElement.style.setProperty('--night-text', getLum(value)>0.4?'#0e0e0f':'#e8e8ea');
-  }
-}
-
-let saveTimer = null;
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveState, 400);
-}
-
-function flashSaved() {
-  const badge = document.getElementById('save-badge');
-  badge.classList.add('show');
-  setTimeout(() => badge.classList.remove('show'), 1800);
-}
-
-function clearAllData() {
-  if (!confirm('Сбросить все данные и начать заново?')) return;
-  try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
-  location.reload();
-}
-
-// ══════════════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════════════
-function init() {
-  const ts = fmtDate(today);
-  // Default dates before potential load
-  ['day-start','night-start','hybrid-start'].forEach(id => document.getElementById(id).value = ts);
-  const m1 = new Date(today.getFullYear(), today.getMonth(), 1);
-  const m2 = new Date(today.getFullYear(), today.getMonth()+1, 0);
-  document.getElementById('stats-from').value = fmtDate(m1);
-  document.getElementById('stats-to').value   = fmtDate(m2);
-
-  // Load saved state (overwrites defaults if present)
-  loadState();
-
-  // Restore panel state
-  if (panelOpen) {
-    document.getElementById('panel-body').classList.add('open');
-    document.getElementById('panel-toggle').classList.add('open');
-    document.getElementById('panel-arrow').textContent = '▲';
-    document.getElementById('panel-label').textContent = 'Свернуть';
-  }
-
-  // Stats listeners
-  document.getElementById('stats-from').addEventListener('change', () => { updateStats(); scheduleSave(); });
-  document.getElementById('stats-to').addEventListener('change',   () => { updateStats(); scheduleSave(); });
-
-  renderPatternEditor();
-  renderCalendar();
-  updateStats();
-
-  document.addEventListener('click', hideCtx);
-  document.addEventListener('keydown', e => { if(e.key==='Escape') hideCtx(); });
-}
-
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════
 //  UTILS
-// ══════════════════════════════════════════════════════
-function fmtDate(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
+// ══════════════════════════════════════
+function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function parseDate(s) { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
 function diffDays(a,b) { return Math.round((b-a)/86400000); }
-const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь',
-                   'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+function getLum(h) {
+  const r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;
+  return 0.2126*r+0.7152*g+0.0722*b;
+}
+function textFor(c) { return getLum(c)>0.45?'#0e0e0f':'#e8e8ea'; }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════
 //  SCHEDULE RESOLUTION
-// ══════════════════════════════════════════════════════
-function getShiftForDate(ds) {
-  if (manualOverrides[ds] !== undefined) return manualOverrides[ds];
+// ══════════════════════════════════════
+function getShift(p, ds) {
+  if (p.manualOverrides[ds] !== undefined) return p.manualOverrides[ds];
   const d = parseDate(ds);
-  if (schedules.hybrid) {
-    const diff = diffDays(schedules.hybrid.startDate, d);
-    if (diff >= 0) return schedules.hybrid.pattern[diff % schedules.hybrid.pattern.length].t;
+  const s = p.schedules;
+  if (s.hybrid) {
+    const diff = diffDays(s.hybrid.startDate, d);
+    if (diff >= 0) return s.hybrid.pattern[diff % s.hybrid.pattern.length].t;
   }
-  let result = null;
-  if (schedules.day) {
-    const s = schedules.day, diff = diffDays(s.startDate, d);
-    if (diff >= 0 && (diff % (s.work+s.rest)) < s.work) result = 'day';
-  }
-  if (schedules.night) {
-    const s = schedules.night, diff = diffDays(s.startDate, d);
-    if (diff >= 0 && (diff % (s.work+s.rest)) < s.work) result = 'night';
-  }
-  return result;
+  let r = null;
+  if (s.day) { const diff=diffDays(s.day.startDate,d); if(diff>=0&&(diff%(s.day.work+s.day.rest))<s.day.work) r='day'; }
+  if (s.night) { const diff=diffDays(s.night.startDate,d); if(diff>=0&&(diff%(s.night.work+s.night.rest))<s.night.work) r='night'; }
+  return r;
 }
-
-function isHybridSource(ds) {
-  if (!schedules.hybrid || manualOverrides[ds] !== undefined) return false;
-  return diffDays(schedules.hybrid.startDate, parseDate(ds)) >= 0;
+function isHybrid(p, ds) {
+  if (!p.schedules.hybrid || p.manualOverrides[ds]!==undefined) return false;
+  return diffDays(p.schedules.hybrid.startDate, parseDate(ds)) >= 0;
 }
-
-function getHours(type, ds) {
-  if (isHybridSource(ds)) return type==='day' ? schedules.hybrid.dayHours : schedules.hybrid.nightHours;
-  if (type==='day'   && schedules.day)   return schedules.day.hours;
-  if (type==='night' && schedules.night) return schedules.night.hours;
-  if (schedules.hybrid) return type==='day' ? schedules.hybrid.dayHours : schedules.hybrid.nightHours;
+function getHours(p, type, ds) {
+  if (isHybrid(p,ds)) return type==='day'?p.schedules.hybrid.dayHours:p.schedules.hybrid.nightHours;
+  if (type==='day'  && p.schedules.day)   return p.schedules.day.hours;
+  if (type==='night'&& p.schedules.night) return p.schedules.night.hours;
+  if (p.schedules.hybrid) return type==='day'?p.schedules.hybrid.dayHours:p.schedules.hybrid.nightHours;
   return 12;
 }
+function isWorking(p, ds) { const s=getShift(p,ds); return s==='day'||s==='night'; }
 
-// ══════════════════════════════════════════════════════
-//  CALENDAR RENDER
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════
+//  CALENDAR
+// ══════════════════════════════════════
+function renderLegend() {
+  const leg = document.getElementById('cal-legend');
+  leg.innerHTML = '';
+  const vis = profiles.filter(p=>p.visible);
+  if (vis.length === 0) return;
+  // show profile dots + shared off legend
+  vis.forEach(p => {
+    const el=document.createElement('div'); el.className='legend-item';
+    el.innerHTML=`<div class="legend-dot" style="background:${p.dayColor}"></div><span>${p.name}</span>`;
+    leg.appendChild(el);
+  });
+  if (vis.length > 1) {
+    const el=document.createElement('div'); el.className='legend-item';
+    el.innerHTML=`<div class="legend-dot" style="border:1px solid #f59e0b;background:transparent"></div><span>Совместный выходной</span>`;
+    leg.appendChild(el);
+  }
+}
+
 function renderCalendar() {
   document.getElementById('month-title').textContent = `${MONTHS_RU[viewMonth]} ${viewYear}`;
+  renderLegend();
   const grid = document.getElementById('cal-grid');
   grid.innerHTML = '';
-  const firstDay = new Date(viewYear, viewMonth, 1);
-  const lastDay  = new Date(viewYear, viewMonth+1, 0);
-  let dow = firstDay.getDay(); dow = dow===0?6:dow-1;
-  for (let i=0;i<dow;i++) grid.appendChild(makeCell(new Date(viewYear,viewMonth,1-(dow-i)),true));
-  for (let d=1;d<=lastDay.getDate();d++) grid.appendChild(makeCell(new Date(viewYear,viewMonth,d),false));
-  const rem=(dow+lastDay.getDate())%7;
-  if(rem) for(let i=1;i<=7-rem;i++) grid.appendChild(makeCell(new Date(viewYear,viewMonth+1,i),true));
+  const first = new Date(viewYear, viewMonth, 1);
+  const last  = new Date(viewYear, viewMonth+1, 0);
+  let dow = first.getDay(); dow = dow===0?6:dow-1;
+  for (let i=0;i<dow;i++) grid.appendChild(mkCell(new Date(viewYear,viewMonth,1-(dow-i)),true));
+  for (let d=1;d<=last.getDate();d++) grid.appendChild(mkCell(new Date(viewYear,viewMonth,d),false));
+  const rem=(dow+last.getDate())%7;
+  if(rem) for(let i=1;i<=7-rem;i++) grid.appendChild(mkCell(new Date(viewYear,viewMonth+1,i),true));
   updateStats();
 }
 
-function makeCell(date, other) {
+function mkCell(date, other) {
   const cell = document.createElement('div');
   cell.className = 'cal-cell';
   const ds = fmtDate(date);
   cell.dataset.date = ds;
-  const shift = getShiftForDate(ds);
-  applyClass(cell, shift);
+
   if (other) {
     cell.classList.add('other-month');
-    const n=document.createElement('div'); n.className='cell-num'; n.textContent=date.getDate(); cell.appendChild(n);
-    return cell;
+    const n=document.createElement('div'); n.className='cell-num'; n.textContent=date.getDate();
+    cell.appendChild(n); return cell;
   }
+
   if (date.getTime()===today.getTime()) cell.classList.add('today-cell');
-  const numEl=document.createElement('div'); numEl.className='cell-num'; numEl.textContent=date.getDate();
-  const typeEl=document.createElement('div'); typeEl.className='cell-type'; typeEl.textContent=typeLabel(shift,ds);
+  const numEl  = document.createElement('div'); numEl.className='cell-num'; numEl.textContent=date.getDate();
+  const typeEl = document.createElement('div'); typeEl.className='cell-type';
   cell.appendChild(numEl); cell.appendChild(typeEl);
-  if (isHybridSource(ds)) { const b=document.createElement('div'); b.className='hybrid-badge'; cell.appendChild(b); }
-  cell.addEventListener('click', e=>{ e.stopPropagation(); cycleShift(ds,cell); });
-  cell.addEventListener('contextmenu', e=>{ e.preventDefault(); showCtx(e,ds); });
-  cell.addEventListener('mouseenter', e=>showTooltip(e,ds,date));
-  cell.addEventListener('mouseleave', ()=>document.getElementById('tooltip').style.display='none');
+
+  paintCell(cell, ds, typeEl);
+
+  cell.addEventListener('click', e => { e.stopPropagation(); onCellClick(ds, cell); });
+  cell.addEventListener('contextmenu', e => { e.preventDefault(); onCellRightClick(e, ds); });
+  cell.addEventListener('mouseenter', e => showTooltip(e, ds, date));
+  cell.addEventListener('mouseleave', () => { document.getElementById('tooltip').style.display='none'; });
   return cell;
 }
 
-function typeLabel(shift, ds) {
-  const p=isHybridSource(ds)?'г/':'';
-  if(shift==='day') return p+'день';
-  if(shift==='night') return p+'ночь';
-  return '';
-}
-function applyClass(cell, shift) {
-  cell.classList.remove('day-shift','night-shift','off');
-  if(shift==='day') cell.classList.add('day-shift');
-  else if(shift==='night') cell.classList.add('night-shift');
-  else cell.classList.add('off');
-}
-function refreshCell(cell, ds) {
-  const shift=getShiftForDate(ds);
-  applyClass(cell,shift);
-  const t=cell.querySelector('.cell-type'); if(t) t.textContent=typeLabel(shift,ds);
-  let b=cell.querySelector('.hybrid-badge');
-  if(isHybridSource(ds)){if(!b){b=document.createElement('div');b.className='hybrid-badge';cell.appendChild(b);}}
-  else if(b) b.remove();
-}
-function cycleShift(ds, cell) {
-  const cur=getShiftForDate(ds); let next;
-  if(!cur||cur==='off') next='day';
-  else if(cur==='day')  next='night';
-  else                  next='off';
-  manualOverrides[ds]=next;
-  refreshCell(cell,ds); updateStats(); scheduleSave();
+function paintCell(cell, ds, typeEl) {
+  // Remove old stripes
+  cell.querySelectorAll('.cell-stripes,.overlap-badge').forEach(e=>e.remove());
+  cell.style.background = '';
+  cell.classList.remove('c-off');
+
+  const vis = profiles.filter(p=>p.visible);
+  if (vis.length === 0) { cell.classList.add('c-off'); if(typeEl) typeEl.textContent=''; return; }
+
+  // Gather shifts
+  const shifts = vis.map(p => ({ p, s: getShift(p, ds) }));
+  const working = shifts.filter(x => x.s==='day'||x.s==='night');
+  const allOff  = working.length === 0;
+  const allWork = working.length === vis.length;
+
+  if (vis.length === 1) {
+    // Single profile — simple coloring
+    const {p, s} = shifts[0];
+    if (s==='day')   { cell.style.background=p.dayColor;   if(typeEl){typeEl.textContent=(isHybrid(p,ds)?'г/':'')+'день';typeEl.style.color=textFor(p.dayColor);} numEl(cell).style.color=textFor(p.dayColor); }
+    else if(s==='night'){ cell.style.background=p.nightColor; if(typeEl){typeEl.textContent=(isHybrid(p,ds)?'г/':'')+'ночь';typeEl.style.color=textFor(p.nightColor);} numEl(cell).style.color=textFor(p.nightColor); }
+    else { cell.classList.add('c-off'); if(typeEl)typeEl.textContent=''; numEl(cell).style.color=''; }
+    return;
+  }
+
+  // Multi-profile stripes
+  const stripes = document.createElement('div'); stripes.className='cell-stripes';
+  shifts.forEach(({p,s}) => {
+    const stripe = document.createElement('div'); stripe.className='cell-stripe';
+    if(s==='day')    stripe.style.background = p.dayColor;
+    else if(s==='night') stripe.style.background = p.nightColor;
+    else              stripe.style.background = p.offColor||'#1e1e21';
+    stripes.appendChild(stripe);
+  });
+  cell.insertBefore(stripes, cell.firstChild);
+  cell.style.background = 'transparent';
+  numEl(cell).style.color = ''; // let contrast handle via overlay
+
+  if (typeEl) {
+    if (allOff) {
+      typeEl.textContent = '';
+      // shared off highlight — amber border
+      const allHaveSchedule = vis.some(p => p.schedules.day||p.schedules.night||p.schedules.hybrid);
+      if (allHaveSchedule) {
+        cell.style.outline = '2px solid rgba(245,158,11,0.5)';
+        cell.style.outlineOffset = '-2px';
+        // small badge
+        const ob=document.createElement('div'); ob.className='overlap-badge'; ob.textContent='✦';
+        cell.appendChild(ob);
+      }
+    } else {
+      cell.style.outline = '';
+      typeEl.textContent = '';
+      if (allWork) {
+        const ob=document.createElement('div'); ob.className='overlap-badge'; ob.textContent='все';
+        cell.appendChild(ob);
+      }
+    }
+  }
 }
 
-// ══════════════════════════════════════════════════════
-//  PANEL TOGGLE
-// ══════════════════════════════════════════════════════
-function togglePanel() {
-  panelOpen = !panelOpen;
-  document.getElementById('panel-body').classList.toggle('open', panelOpen);
-  document.getElementById('panel-toggle').classList.toggle('open', panelOpen);
-  document.getElementById('panel-arrow').textContent = panelOpen ? '▲' : '▼';
-  document.getElementById('panel-label').textContent = panelOpen ? 'Свернуть' : 'Настройки и статистика';
+function numEl(cell) { return cell.querySelector('.cell-num'); }
+
+function refreshCell(ds) {
+  const cell = document.querySelector(`.cal-cell[data-date="${ds}"]`);
+  if (!cell) return;
+  cell.style.outline = '';
+  paintCell(cell, ds, cell.querySelector('.cell-type'));
+}
+
+// ══════════════════════════════════════
+//  CELL INTERACTION
+// ══════════════════════════════════════
+function onCellClick(ds, cell) {
+  // If only one profile, cycle it. If multiple, cycle the first visible
+  const vis = profiles.filter(p=>p.visible);
+  if (vis.length === 0) return;
+  const p = vis[0];
+  const cur = getShift(p, ds);
+  let next;
+  if(!cur||cur==='off') next='day'; else if(cur==='day') next='night'; else next='off';
+  p.manualOverrides[ds]=next;
+  refreshCell(ds); updateStats(); scheduleSave();
+}
+
+function onCellRightClick(e, ds) {
+  ctxDate = ds;
+  // build ctx sub-menu for profiles
+  buildCtxMenu();
+  const menu = document.getElementById('ctx-menu');
+  menu.classList.add('visible');
+  let x=e.clientX,y=e.clientY;
+  if(x+185>window.innerWidth)x-=185; if(y+200>window.innerHeight)y-=200;
+  menu.style.left=x+'px'; menu.style.top=y+'px';
+}
+
+function buildCtxMenu() {
+  const menu = document.getElementById('ctx-menu');
+  menu.innerHTML = '';
+  const vis = profiles.filter(p=>p.visible);
+  if (vis.length > 1) {
+    vis.forEach(p => {
+      const hdr = document.createElement('div');
+      hdr.style.cssText='padding:4px 11px;font-size:0.6rem;color:var(--muted);display:flex;align-items:center;gap:5px';
+      hdr.innerHTML=`<span style="width:6px;height:6px;border-radius:50%;background:${p.dayColor};display:inline-block"></span>${p.name}`;
+      menu.appendChild(hdr);
+      ['day','night','off'].forEach(type => {
+        const item=document.createElement('div'); item.className='ctx-item';
+        item.style.paddingLeft='24px';
+        item.innerHTML=`<span class="ctx-icon">${type==='day'?'☀':type==='night'?'☾':'○'}</span>${type==='day'?'Дневная':type==='night'?'Ночная':'Выходной'}`;
+        item.onclick=()=>{ p.manualOverrides[ctxDate]=type; refreshCell(ctxDate); updateStats(); scheduleSave(); hideCtx(); };
+        menu.appendChild(item);
+      });
+      const resetItem=document.createElement('div'); resetItem.className='ctx-item';
+      resetItem.style.paddingLeft='24px';
+      resetItem.innerHTML=`<span class="ctx-icon">✕</span>Сбросить`;
+      resetItem.onclick=()=>{ delete p.manualOverrides[ctxDate]; refreshCell(ctxDate); updateStats(); scheduleSave(); hideCtx(); };
+      menu.appendChild(resetItem);
+      const sep=document.createElement('div'); sep.className='ctx-sep'; menu.appendChild(sep);
+    });
+  } else {
+    // single profile simple menu
+    [['day','☀','Дневная'],['night','☾','Ночная'],['off','○','Выходной']].forEach(([type,icon,label])=>{
+      const item=document.createElement('div'); item.className='ctx-item';
+      item.innerHTML=`<span class="ctx-icon">${icon}</span>${label}`;
+      item.onclick=()=>ctxSet(type); menu.appendChild(item);
+    });
+    const sep=document.createElement('div'); sep.className='ctx-sep'; menu.appendChild(sep);
+    const clear=document.createElement('div'); clear.className='ctx-item';
+    clear.innerHTML=`<span class="ctx-icon">✕</span>Сбросить`;
+    clear.onclick=ctxClear; menu.appendChild(clear);
+  }
+}
+
+function hideCtx(){document.getElementById('ctx-menu').classList.remove('visible');}
+function ctxSet(type){
+  if(!ctxDate)return;
+  const vis=profiles.filter(p=>p.visible);
+  if(vis.length>0){vis[0].manualOverrides[ctxDate]=type; refreshCell(ctxDate); updateStats(); scheduleSave();}
+  hideCtx();
+}
+function ctxClear(){
+  if(!ctxDate)return;
+  const vis=profiles.filter(p=>p.visible);
+  if(vis.length>0){delete vis[0].manualOverrides[ctxDate]; refreshCell(ctxDate); updateStats(); scheduleSave();}
+  hideCtx();
+}
+
+// ══════════════════════════════════════
+//  TOOLTIP
+// ══════════════════════════════════════
+function showTooltip(e, ds, date) {
+  const dow=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][date.getDay()];
+  let lines = [`${dow}, ${date.getDate()}.${String(date.getMonth()+1).padStart(2,'0')}.${date.getFullYear()}`];
+  const vis = profiles.filter(p=>p.visible);
+  vis.forEach(p => {
+    const s=getShift(p,ds);
+    const icon = s==='day'?'☀':s==='night'?'☾':'○';
+    const label = s==='day'?`Дневная ${getHours(p,'day',ds)}ч`:s==='night'?`Ночная ${getHours(p,'night',ds)}ч`:'Выходной';
+    const manual = p.manualOverrides[ds]!==undefined?' ✎':'';
+    lines.push(`${icon} ${p.name}: ${label}${manual}`);
+  });
+  const tip=document.getElementById('tooltip');
+  tip.innerHTML=lines.map((l,i)=>i===0?`<b style="color:var(--text)">${l}</b>`:l).join('<br>');
+  tip.style.display='block';
+  tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-30)+'px';
+}
+
+// ══════════════════════════════════════
+//  PROFILES PANEL
+// ══════════════════════════════════════
+function addProfile() {
+  const p = mkProfile(`Профиль ${profiles.length+1}`, profiles.length);
+  profiles.push(p);
+  renderProfilesList();
+  renderCalendar();
   scheduleSave();
 }
 
-// ══════════════════════════════════════════════════════
-//  TABS / PRESETS
-// ══════════════════════════════════════════════════════
-function setTab(type, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-  ['day-config','night-config','hybrid-config'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById(`${type}-config`).style.display='flex';
-}
-function setPreset(type,work,rest,btn) {
-  document.getElementById(`${type}-work`).value=work;
-  document.getElementById(`${type}-rest`).value=rest;
-  document.querySelectorAll(`#${type}-config .preset-btn`).forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function setHybridPreset(pattern, btn) {
-  hybridPattern=pattern.map(p=>({...p})); renderPatternEditor();
-  document.querySelectorAll('#hybrid-presets .preset-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+function removeProfile(id) {
+  if (profiles.length <= 1) return;
+  profiles = profiles.filter(p=>p.id!==id);
+  renderProfilesList();
+  renderCalendar();
+  updateStats();
+  scheduleSave();
 }
 
-// ══════════════════════════════════════════════════════
-//  PATTERN EDITOR
-// ══════════════════════════════════════════════════════
-const SCYCLE=['day','night','off'],SICON={day:'☀',night:'☾',off:'○'},SCLS={day:'slot-day',night:'slot-night',off:'slot-off'};
-function renderPatternEditor() {
-  const ed=document.getElementById('pattern-editor'); ed.innerHTML='';
-  hybridPattern.forEach((slot,i)=>{
+function renderProfilesList() {
+  const list = document.getElementById('profiles-list');
+  list.innerHTML = '';
+  profiles.forEach(p => list.appendChild(buildProfileRow(p)));
+  // update stats profile selector
+  const sel = document.getElementById('stats-profile-sel');
+  const prev = sel.value;
+  sel.innerHTML = profiles.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if (profiles.find(p=>String(p.id)===prev)) sel.value=prev;
+  updateStats();
+}
+
+const SCYCLE=['day','night','off'], SICON={day:'☀',night:'☾',off:'○'};
+
+function buildProfileRow(p) {
+  const row = document.createElement('div');
+  row.className = 'profile-row';
+  row.id = `prow-${p.id}`;
+
+  // -- Header
+  const hdr = document.createElement('div'); hdr.className='profile-header';
+
+  // accent dot (click to pick color)
+  const dot=document.createElement('div'); dot.className='p-accent-dot'; dot.style.background=p.dayColor;
+  dot.title='Изменить цвет';
+  const colorIn=document.createElement('input'); colorIn.type='color'; colorIn.value=p.dayColor;
+  colorIn.style.display='none'; row.appendChild(colorIn);
+  colorIn.oninput=()=>{ p.dayColor=colorIn.value; dot.style.background=colorIn.value; renderCalendar(); scheduleSave(); };
+  dot.onclick=(e)=>{ e.stopPropagation(); colorIn.click(); };
+
+  // name
+  const nameIn=document.createElement('input'); nameIn.className='p-name-input'; nameIn.type='text'; nameIn.value=p.name;
+  nameIn.oninput=()=>{ p.name=nameIn.value; renderCalendar(); document.getElementById('stats-profile-sel').querySelector(`option[value="${p.id}"]`).textContent=p.name; scheduleSave(); };
+  nameIn.onclick=e=>e.stopPropagation();
+
+  // visibility toggle
+  const showBtn=document.createElement('button'); showBtn.className=`p-show-btn ${p.visible?'on':'off'}`;
+  showBtn.textContent=p.visible?'виден':'скрыт';
+  showBtn.onclick=e=>{ e.stopPropagation(); p.visible=!p.visible; showBtn.className=`p-show-btn ${p.visible?'on':'off'}`; showBtn.textContent=p.visible?'виден':'скрыт'; renderCalendar(); scheduleSave(); };
+
+  // chevron
+  const chev=document.createElement('span'); chev.className=`p-chevron ${p.openInPanel?'open':''}`; chev.textContent='▲';
+
+  // delete
+  const del=document.createElement('button'); del.className='p-delete-btn'; del.textContent='✕'; del.title='Удалить профиль';
+  del.onclick=e=>{ e.stopPropagation(); if(profiles.length>1) removeProfile(p.id); };
+
+  hdr.appendChild(dot); hdr.appendChild(nameIn); hdr.appendChild(showBtn); hdr.appendChild(chev); hdr.appendChild(del);
+  hdr.addEventListener('click', ()=>{ p.openInPanel=!p.openInPanel; body.classList.toggle('open',p.openInPanel); chev.classList.toggle('open',p.openInPanel); });
+  row.appendChild(hdr);
+
+  // -- Body
+  const body=document.createElement('div'); body.className=`profile-body ${p.openInPanel?'open':''}`;
+
+  // -- Colors (always visible at top of profile body)
+  const colorsSec=document.createElement('div');
+  colorsSec.style.cssText='display:flex;flex-direction:column;gap:4px;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:8px';
+  const colorsLabel=document.createElement('div');
+  colorsLabel.style.cssText='font-size:0.6rem;color:var(--muted);margin-bottom:4px';
+  colorsLabel.textContent='Цвета смен';
+  const colorsRow=document.createElement('div'); colorsRow.className='color-swatch-row';
+  [['day','☀ День'],['night','☾ Ночь'],['off','○ Выходной']].forEach(([key,label])=>{
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:2px;flex:1';
+    const chip=document.createElement('div'); chip.className='color-chip';
+    chip.style.cssText=`background:${p[key+'Color']};width:100%;border-radius:var(--radius-sm);height:24px`;
+    const cin=document.createElement('input'); cin.type='color'; cin.style.display='none'; cin.value=p[key+'Color'];
+    cin.oninput=()=>{
+      p[key+'Color']=cin.value; chip.style.background=cin.value;
+      if(key==='day'){ dot.style.background=cin.value; colorIn.value=cin.value; }
+      renderCalendar(); scheduleSave();
+    };
+    chip.onclick=()=>cin.click();
+    const lbl=document.createElement('div');
+    lbl.style.cssText='font-size:0.56rem;color:var(--muted);text-align:center';
+    lbl.textContent=label;
+    wrap.appendChild(chip); wrap.appendChild(cin); wrap.appendChild(lbl);
+    colorsRow.appendChild(wrap);
+  });
+  colorsSec.appendChild(colorsLabel); colorsSec.appendChild(colorsRow);
+  body.appendChild(colorsSec);
+
+  // sub-tabs
+  const tabs=document.createElement('div'); tabs.className='sub-tabs';
+  ['day','night','hybrid'].forEach(type=>{
+    const btn=document.createElement('button'); btn.className=`sub-tab ${p.activeTab===type?'active':''}`;
+    btn.textContent=type==='day'?'☀ День':type==='night'?'☾ Ночь':'⇄ Гибрид';
+    btn.onclick=()=>{
+      p.activeTab=type;
+      tabs.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+      body.querySelectorAll('.tab-pane').forEach(el=>el.style.display='none');
+      body.querySelector(`.tab-pane[data-type="${type}"]`).style.display='flex';
+      scheduleSave();
+    };
+    tabs.appendChild(btn);
+  });
+  body.appendChild(tabs);
+
+  // build each tab pane
+  ['day','night','hybrid'].forEach(type=>{
+    const pane=document.createElement('div'); pane.className='tab-pane'; pane.dataset.type=type;
+    pane.style.cssText='display:flex;flex-direction:column;gap:7px;';
+    pane.style.display=p.activeTab===type?'flex':'none';
+
+    if(type==='hybrid') {
+      // pattern editor
+      const pw=document.createElement('div'); pw.className='pattern-wrap';
+      const pl=document.createElement('div'); pl.className='pattern-label'; pl.textContent='Паттерн (клик — тип, ПКМ — удалить):';
+      const pe=document.createElement('div'); pe.className='pattern-editor';
+      buildPatternEditor(pe, p);
+      const ph=document.createElement('div'); ph.className='pattern-hint'; ph.textContent='☀ день · ☾ ночь · ○ выходной';
+      pw.appendChild(pl); pw.appendChild(pe); pw.appendChild(ph); pane.appendChild(pw);
+
+      // presets
+      const pr=document.createElement('div'); pr.className='preset-row';
+      [['Д·Н·2в',[{t:'day'},{t:'night'},{t:'off'},{t:'off'}]],
+       ['2Д·2Н·2в',[{t:'day'},{t:'day'},{t:'night'},{t:'night'},{t:'off'},{t:'off'}]],
+       ['Д·2Н·1в',[{t:'day'},{t:'night'},{t:'night'},{t:'off'}]]
+      ].forEach(([label,pat])=>{
+        const btn=document.createElement('button'); btn.className='preset-btn'; btn.textContent=label;
+        btn.onclick=()=>{ p.hybridPattern=pat.map(x=>({...x})); buildPatternEditor(pe,p); scheduleSave(); };
+        pr.appendChild(btn);
+      });
+      pane.appendChild(pr);
+
+      appendField(pane, 'Часов (день)', 'number', p.schedules.hybrid?.dayHours??12, v=>{ if(p.schedules.hybrid)p.schedules.hybrid.dayHours=+v; });
+      appendField(pane, 'Часов (ночь)', 'number', p.schedules.hybrid?.nightHours??12, v=>{ if(p.schedules.hybrid)p.schedules.hybrid.nightHours=+v; });
+      appendField(pane, 'Начало цикла', 'date', p.schedules.hybrid?fmtDate(p.schedules.hybrid.startDate):fmtDate(today), v=>{ if(p.schedules.hybrid)p.schedules.hybrid.startDate=parseDate(v); });
+    } else {
+      const s=p.schedules[type];
+      const fWork=appendField(pane,'Рабочих дней','number',s?.work??2);
+      const fRest=appendField(pane,'Выходных дней','number',s?.rest??2);
+      const fHours=appendField(pane,'Часов в смене','number',s?.hours??12);
+      const fStart=appendField(pane,'Начало цикла','date',s?fmtDate(s.startDate):fmtDate(today));
+
+      const presets=document.createElement('div'); presets.className='preset-row';
+      [[2,2],[5,2],[3,3],[4,3],[1,3]].forEach(([w,r])=>{
+        const btn=document.createElement('button'); btn.className='preset-btn'; btn.textContent=`${w}/${r}`;
+        btn.onclick=()=>{ fWork.value=w; fRest.value=r; };
+        presets.appendChild(btn);
+      });
+      pane.appendChild(presets);
+
+      const applyBtn=document.createElement('button'); applyBtn.className='apply-btn'; applyBtn.textContent='Применить';
+      applyBtn.onclick=()=>{
+        p.schedules[type]={
+          work:+fWork.value||2, rest:+fRest.value||2, hours:+fHours.value||12,
+          startDate:parseDate(fStart.value||fmtDate(today))
+        };
+        renderCalendar(); scheduleSave();
+      };
+      pane.appendChild(applyBtn);
+
+      const clearBtn=document.createElement('button'); clearBtn.className='clear-btn'; clearBtn.textContent='Сбросить';
+      clearBtn.onclick=()=>{ p.schedules[type]=null; renderCalendar(); scheduleSave(); };
+      pane.appendChild(clearBtn);
+    }
+
+    if(type==='hybrid'){
+      const applyBtn=document.createElement('button'); applyBtn.className='apply-btn'; applyBtn.textContent='Применить';
+      applyBtn.onclick=()=>{
+        const inputs=pane.querySelectorAll('.field-input, .date-input');
+        p.schedules.hybrid={
+          pattern:p.hybridPattern.map(x=>({...x})),
+          dayHours:+inputs[0].value||12, nightHours:+inputs[1].value||12,
+          startDate:parseDate(inputs[2].value||fmtDate(today))
+        };
+        renderCalendar(); scheduleSave();
+      };
+      pane.appendChild(applyBtn);
+      const clearBtn=document.createElement('button'); clearBtn.className='clear-btn'; clearBtn.textContent='Сбросить';
+      clearBtn.onclick=()=>{ p.schedules.hybrid=null; renderCalendar(); scheduleSave(); };
+      pane.appendChild(clearBtn);
+    }
+
+    // colors are now in the permanent top section of the profile body
+
+    body.appendChild(pane);
+  });
+  row.appendChild(body);
+  return row;
+}
+
+function buildPatternEditor(pe, p) {
+  pe.innerHTML='';
+  p.hybridPattern.forEach((slot,i)=>{
     const el=document.createElement('div');
-    el.className=`pattern-slot ${SCLS[slot.t]}`; el.textContent=SICON[slot.t]; el.title='ЛКМ — тип · ПКМ — удалить';
+    el.className=`pattern-slot ${slot.t==='off'?'slot-off':''}`;
+    el.textContent=SICON[slot.t];
+    el.style.background=slot.t==='day'?p.dayColor:slot.t==='night'?p.nightColor:'';
+    el.style.color=slot.t==='off'?'':textFor(slot.t==='day'?p.dayColor:p.nightColor);
     el.addEventListener('click',()=>{
       slot.t=SCYCLE[(SCYCLE.indexOf(slot.t)+1)%3];
-      el.className=`pattern-slot ${SCLS[slot.t]}`; el.textContent=SICON[slot.t];
+      el.className=`pattern-slot ${slot.t==='off'?'slot-off':''}`;
+      el.textContent=SICON[slot.t];
+      el.style.background=slot.t==='day'?p.dayColor:slot.t==='night'?p.nightColor:'';
+      el.style.color=slot.t==='off'?'':textFor(slot.t==='day'?p.dayColor:p.nightColor);
       scheduleSave();
     });
-    el.addEventListener('contextmenu',e=>{
-      e.preventDefault();
-      if(hybridPattern.length>1){hybridPattern.splice(i,1);renderPatternEditor();scheduleSave();}
-    });
-    ed.appendChild(el);
+    el.addEventListener('contextmenu',e=>{ e.preventDefault(); if(p.hybridPattern.length>1){p.hybridPattern.splice(i,1);buildPatternEditor(pe,p);scheduleSave();} });
+    pe.appendChild(el);
   });
   const add=document.createElement('button'); add.className='pattern-add-btn'; add.textContent='+';
-  add.onclick=()=>{hybridPattern.push({t:'off'});renderPatternEditor();scheduleSave();};
-  ed.appendChild(add);
+  add.onclick=()=>{ p.hybridPattern.push({t:'off'}); buildPatternEditor(pe,p); scheduleSave(); };
+  pe.appendChild(add);
 }
 
-// ══════════════════════════════════════════════════════
-//  APPLY / CLEAR
-// ══════════════════════════════════════════════════════
-function applySchedule(type) {
-  if(type==='hybrid') {
-    schedules.hybrid={
-      pattern:hybridPattern.map(p=>({...p})),
-      dayHours:parseInt(document.getElementById('hybrid-day-hours').value)||12,
-      nightHours:parseInt(document.getElementById('hybrid-night-hours').value)||12,
-      startDate:parseDate(document.getElementById('hybrid-start').value||fmtDate(today))
-    };
-  } else {
-    schedules[type]={
-      work:parseInt(document.getElementById(`${type}-work`).value)||2,
-      rest:parseInt(document.getElementById(`${type}-rest`).value)||2,
-      hours:parseInt(document.getElementById(`${type}-hours`).value)||12,
-      startDate:parseDate(document.getElementById(`${type}-start`).value||fmtDate(today))
-    };
+function appendField(container, label, type, value, onchange) {
+  const row=document.createElement('div'); row.className='field-row';
+  const lbl=document.createElement('span'); lbl.className='field-label'; lbl.textContent=label;
+  const inp=document.createElement('input');
+  inp.className=type==='date'?'date-input':'field-input';
+  inp.type=type; inp.value=value;
+  if(type==='number'){inp.min=1;inp.max=type==='number'?30:24;}
+  if(onchange) inp.oninput=()=>onchange(inp.value);
+  row.appendChild(lbl); row.appendChild(inp);
+  container.appendChild(row);
+  return inp;
+}
+
+// ══════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════
+function updateStats() {
+  const sel=document.getElementById('stats-profile-sel');
+  const pid=+sel.value;
+  const p=profiles.find(x=>x.id===pid); if(!p) return;
+  const f=document.getElementById('stats-from').value, t=document.getElementById('stats-to').value;
+  if(!f||!t)return;
+  const from=parseDate(f), to=parseDate(t); if(from>to)return;
+  let dayS=0,nightS=0,dayH=0,nightH=0; const cur=new Date(from);
+  while(cur<=to){
+    const ds=fmtDate(cur),s=getShift(p,ds);
+    if(s==='day')  {dayS++;dayH+=getHours(p,'day',ds);}
+    if(s==='night'){nightS++;nightH+=getHours(p,'night',ds);}
+    cur.setDate(cur.getDate()+1);
   }
-  renderCalendar(); scheduleSave();
+  const rD=parseFloat(document.getElementById('rate-day').value)||0;
+  const rN=parseFloat(document.getElementById('rate-night').value)||0;
+  const sal=dayH*rD+nightH*rN;
+  document.getElementById('stat-day').textContent  =dayS;
+  document.getElementById('stat-night').textContent=nightS;
+  document.getElementById('stat-total').textContent=dayS+nightS;
+  document.getElementById('stat-hours').textContent=dayH+nightH;
+  document.getElementById('stat-salary').textContent=sal.toLocaleString('ru-RU',{maximumFractionDigits:0})+' ₽';
 }
 
-function clearSchedule(type) { schedules[type]=null; renderCalendar(); scheduleSave(); }
+// ══════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════
+function buildTableData() {
+  const from=parseDate(document.getElementById('exp-from').value||fmtDate(new Date(viewYear,viewMonth,1)));
+  const to  =parseDate(document.getElementById('exp-to').value  ||fmtDate(new Date(viewYear,viewMonth+1,0)));
+  const dates=[]; const cur=new Date(from);
+  while(cur<=to){ dates.push(fmtDate(cur)); cur.setDate(cur.getDate()+1); }
+  const onlyVisible=document.getElementById('exp-only-visible')?.checked ?? true;
+  const showOverlap=document.getElementById('exp-show-overlap')?.checked ?? true;
+  const ps=onlyVisible ? profiles.filter(p=>p.visible) : profiles;
+  return { profiles: ps, dates, showOverlap };
+}
 
-// ══════════════════════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════════════════════
-function changeMonth(dir) {
+function shiftLabel(s) { return s==='day'?'Д':s==='night'?'Н':'-'; }
+
+function buildTSV() {
+  const {profiles:ps, dates, showOverlap} = buildTableData();
+  const header = ['Профиль', ...dates].join('\t');
+  const rows = ps.map(p => [p.name, ...dates.map(ds=>shiftLabel(getShift(p,ds)))].join('\t'));
+  if(showOverlap && ps.length>1){
+    const overlapRow=['✦ Совместный выходной',...dates.map(ds=>ps.every(p=>!isWorking(p,ds))?'✦':'')].join('\t');
+    return [header,...rows,overlapRow].join('\n');
+  }
+  return [header,...rows].join('\n');
+}
+
+function copyTSV() {
+  navigator.clipboard.writeText(buildTSV()).then(()=>{ flashSaved('✓ скопировано'); }).catch(()=>{});
+}
+
+function downloadCSV() {
+  const {profiles:ps, dates, showOverlap} = buildTableData();
+  const header = ['Профиль', ...dates].join(',');
+  const rows = ps.map(p => [p.name, ...dates.map(ds=>shiftLabel(getShift(p,ds)))].join(','));
+  const extra = (showOverlap && ps.length>1)
+    ? [['✦ Совместный выходной',...dates.map(ds=>ps.every(p=>!isWorking(p,ds))?'✦':'')].join(',')]
+    : [];
+  const csv = [header,...rows,...extra].join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='shifts.csv'; a.click();
+}
+
+function openExport() {
+  const {profiles:ps, dates} = buildTableData();
+  const table=document.getElementById('export-table');
+  table.innerHTML='';
+  // header row
+  const thead=document.createElement('thead');
+  const hr=document.createElement('tr');
+  const th0=document.createElement('th'); th0.textContent='Профиль'; hr.appendChild(th0);
+  dates.forEach(ds=>{
+    const th=document.createElement('th');
+    const d=parseDate(ds);
+    th.innerHTML=`${d.getDate()}<br><span style="font-size:0.5rem;opacity:0.6">${['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()]}</span>`;
+    hr.appendChild(th);
+  });
+  thead.appendChild(hr); table.appendChild(thead);
+  const tbody=document.createElement('tbody');
+  ps.forEach(p=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td');
+    td0.innerHTML=`<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${p.dayColor};margin-right:5px"></span>${p.name}`;
+    tr.appendChild(td0);
+    dates.forEach(ds=>{
+      const s=getShift(p,ds);
+      const td=document.createElement('td');
+      td.textContent=shiftLabel(s);
+      td.className=s==='day'?'cell-d':s==='night'?'cell-n':'cell-o';
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  // overlap row
+  if(showOverlap && ps.length>1){
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td'); td0.innerHTML='<span style="color:var(--muted)">✦ Совместный выходной</span>'; tr.appendChild(td0);
+    dates.forEach(ds=>{
+      const td=document.createElement('td');
+      const allOff=ps.every(p=>!isWorking(p,ds));
+      td.textContent=allOff?'✦':'';
+      td.className=allOff?'cell-overlap':'cell-o';
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  document.getElementById('export-modal').classList.add('visible');
+}
+
+function closeExport(){document.getElementById('export-modal').classList.remove('visible');}
+
+// ══════════════════════════════════════
+//  NAV / PANEL
+// ══════════════════════════════════════
+function changeMonth(dir){
   viewMonth+=dir;
   if(viewMonth>11){viewMonth=0;viewYear++;} if(viewMonth<0){viewMonth=11;viewYear--;}
   renderCalendar(); scheduleSave();
 }
-function goToday() {
-  viewYear=today.getFullYear(); viewMonth=today.getMonth(); renderCalendar(); scheduleSave();
-}
-
-// ══════════════════════════════════════════════════════
-//  CONTEXT MENU
-// ══════════════════════════════════════════════════════
-function showCtx(e,ds) {
-  ctxTargetDate=ds;
-  const menu=document.getElementById('ctx-menu'); menu.classList.add('visible');
-  let x=e.clientX,y=e.clientY;
-  if(x+190>window.innerWidth)x-=190; if(y+170>window.innerHeight)y-=170;
-  menu.style.left=x+'px'; menu.style.top=y+'px';
-}
-function hideCtx(){document.getElementById('ctx-menu').classList.remove('visible');}
-function ctxSet(type){
-  if(!ctxTargetDate)return;
-  manualOverrides[ctxTargetDate]=type;
-  const cell=document.querySelector(`.cal-cell[data-date="${ctxTargetDate}"]`);
-  if(cell)refreshCell(cell,ctxTargetDate);
-  updateStats(); scheduleSave(); hideCtx();
-}
-function ctxClear(){
-  if(!ctxTargetDate)return;
-  delete manualOverrides[ctxTargetDate];
-  const cell=document.querySelector(`.cal-cell[data-date="${ctxTargetDate}"]`);
-  if(cell)refreshCell(cell,ctxTargetDate);
-  updateStats(); scheduleSave(); hideCtx();
-}
-
-// ══════════════════════════════════════════════════════
-//  TOOLTIP
-// ══════════════════════════════════════════════════════
-function showTooltip(e,ds,date) {
-  const shift=getShiftForDate(ds);
-  const dow=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][date.getDay()];
-  let txt=`${dow}, ${date.getDate()}.${String(date.getMonth()+1).padStart(2,'0')}.${date.getFullYear()}`;
-  if(shift==='day')        txt+=` · ☀ Дневная ${getHours('day',ds)}ч${isHybridSource(ds)?' [гибрид]':''}`;
-  else if(shift==='night') txt+=` · ☾ Ночная ${getHours('night',ds)}ч${isHybridSource(ds)?' [гибрид]':''}`;
-  else txt+=' · Выходной';
-  if(manualOverrides[ds]!==undefined) txt+=' ✎';
-  const tip=document.getElementById('tooltip');
-  tip.textContent=txt; tip.style.display='block';
-  tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY-30)+'px';
-}
-
-// ══════════════════════════════════════════════════════
-//  STATS
-// ══════════════════════════════════════════════════════
-function updateStats() {
-  const f=document.getElementById('stats-from').value;
-  const t=document.getElementById('stats-to').value;
-  if(!f||!t)return;
-  const from=parseDate(f),to=parseDate(t); if(from>to)return;
-  let dayS=0,nightS=0,dayHours=0,nightHours=0; const cur=new Date(from);
-  while(cur<=to){
-    const ds=fmtDate(cur),shift=getShiftForDate(ds);
-    if(shift==='day')   {dayS++;   dayHours+=getHours('day',ds);}
-    if(shift==='night') {nightS++; nightHours+=getHours('night',ds);}
-    cur.setDate(cur.getDate()+1);
-  }
-  const rateDay   = parseFloat(document.getElementById('rate-day').value)   || 0;
-  const rateNight = parseFloat(document.getElementById('rate-night').value) || 0;
-  const salary    = dayHours * rateDay + nightHours * rateNight;
-  const salaryFmt = salary.toLocaleString('ru-RU', {maximumFractionDigits:0});
-
-  document.getElementById('stat-day-shifts').textContent  = dayS;
-  document.getElementById('stat-night-shifts').textContent= nightS;
-  document.getElementById('stat-total-shifts').textContent= dayS+nightS;
-  document.getElementById('stat-hours').textContent       = dayHours+nightHours;
-  document.getElementById('stat-salary').textContent      = salaryFmt+' ₽';
-}
-
-// ══════════════════════════════════════════════════════
-//  COLORS
-// ══════════════════════════════════════════════════════
-function setColor(varName,value,previewId,legendId) {
-  applyColorVar(varName,value,previewId,legendId,varName==='day-color'?'day-color-in':varName==='night-color'?'night-color-in':'off-color-in');
-  renderPatternEditor();
+function goToday(){ viewYear=today.getFullYear(); viewMonth=today.getMonth(); renderCalendar(); scheduleSave(); }
+function togglePanel(){
+  panelOpen=!panelOpen;
+  document.getElementById('panel-body').classList.toggle('open',panelOpen);
+  document.getElementById('panel-toggle').classList.toggle('open',panelOpen);
+  document.getElementById('panel-arrow').textContent=panelOpen?'▲':'▼';
+  document.getElementById('panel-label').textContent=panelOpen?'Свернуть':'Настройки и статистика';
   scheduleSave();
 }
-function getLum(h){
-  const r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;
-  return 0.2126*r+0.7152*g+0.0722*b;
+
+// ══════════════════════════════════════
+//  PERSISTENCE
+// ══════════════════════════════════════
+function serSched(s){ if(!s)return null; return {...s,startDate:fmtDate(s.startDate)}; }
+function deserSched(s){ if(!s)return null; return {...s,startDate:parseDate(s.startDate)}; }
+
+function saveState(){
+  const state={
+    viewYear,viewMonth,panelOpen,nextId,
+    statsFrom:document.getElementById('stats-from').value,
+    statsTo:document.getElementById('stats-to').value,
+    expFrom:document.getElementById('exp-from').value,
+    expTo:document.getElementById('exp-to').value,
+    rateDay:document.getElementById('rate-day').value,
+    rateNight:document.getElementById('rate-night').value,
+    statsPid:document.getElementById('stats-profile-sel').value,
+    profiles:profiles.map(p=>({
+      ...p,
+      schedules:{
+        day:serSched(p.schedules.day),
+        night:serSched(p.schedules.night),
+        hybrid:p.schedules.hybrid?{...p.schedules.hybrid,startDate:fmtDate(p.schedules.hybrid.startDate)}:null,
+      }
+    }))
+  };
+  try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); flashSaved(); }catch(e){}
+}
+
+function loadState(){
+  let raw; try{raw=localStorage.getItem(STORAGE_KEY);}catch(e){return false;}
+  if(!raw)return false;
+  try{
+    const s=JSON.parse(raw);
+    viewYear=s.viewYear??today.getFullYear();
+    viewMonth=s.viewMonth??today.getMonth();
+    panelOpen=s.panelOpen??false;
+    nextId=s.nextId??1;
+    profiles=(s.profiles||[]).map(p=>({
+      ...p,
+      schedules:{
+        day:deserSched(p.schedules?.day),
+        night:deserSched(p.schedules?.night),
+        hybrid:p.schedules?.hybrid?{...p.schedules.hybrid,startDate:parseDate(p.schedules.hybrid.startDate)}:null,
+      },
+      hybridPattern:p.hybridPattern||[{t:'day'},{t:'night'},{t:'off'},{t:'off'}],
+      openInPanel:p.openInPanel??true,
+      activeTab:p.activeTab??'day',
+      rateDay:p.rateDay??0, rateNight:p.rateNight??0,
+    }));
+    if(!profiles.length){ const p=mkProfile('Мой график',0); profiles=[p]; }
+    if(s.statsFrom) document.getElementById('stats-from').value=s.statsFrom;
+    if(s.statsTo)   document.getElementById('stats-to').value=s.statsTo;
+    if(s.expFrom)   document.getElementById('exp-from').value=s.expFrom;
+    if(s.expTo)     document.getElementById('exp-to').value=s.expTo;
+    if(s.rateDay)   document.getElementById('rate-day').value=s.rateDay;
+    if(s.rateNight) document.getElementById('rate-night').value=s.rateNight;
+    return {statsPid:s.statsPid};
+  }catch(e){return false;}
+}
+
+let saveTimer=null;
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveState,400); }
+function flashSaved(msg='✓ сохранено'){
+  const b=document.getElementById('save-badge'); b.textContent=msg; b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'),1800);
+}
+function clearAllData(){
+  if(!confirm('Сбросить всё?'))return;
+  try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+  location.reload();
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+function init(){
+  const m1=new Date(today.getFullYear(),today.getMonth(),1);
+  const m2=new Date(today.getFullYear(),today.getMonth()+1,0);
+  document.getElementById('stats-from').value=fmtDate(m1);
+  document.getElementById('stats-to').value=fmtDate(m2);
+  document.getElementById('exp-from').value=fmtDate(m1);
+  document.getElementById('exp-to').value=fmtDate(m2);
+
+  const loaded=loadState();
+
+  if(panelOpen){
+    document.getElementById('panel-body').classList.add('open');
+    document.getElementById('panel-toggle').classList.add('open');
+    document.getElementById('panel-arrow').textContent='▲';
+    document.getElementById('panel-label').textContent='Свернуть';
+  }
+
+  document.getElementById('stats-from').addEventListener('change',()=>{updateStats();scheduleSave();});
+  document.getElementById('stats-to').addEventListener('change',()=>{updateStats();scheduleSave();});
+  document.getElementById('exp-from').addEventListener('change',scheduleSave);
+  document.getElementById('exp-to').addEventListener('change',scheduleSave);
+
+  renderProfilesList();
+  if(loaded&&loaded.statsPid){ const sel=document.getElementById('stats-profile-sel'); if([...sel.options].find(o=>o.value===String(loaded.statsPid))) sel.value=loaded.statsPid; }
+  renderCalendar();
+  updateStats();
+
+  document.addEventListener('click',hideCtx);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){hideCtx();closeExport();} });
+  document.getElementById('export-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('export-modal'))closeExport(); });
 }
 
 init();
